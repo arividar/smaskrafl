@@ -1,0 +1,33 @@
+<html>
+	<head>
+		<title>Multiplayer 5x5</title>
+		<script type="text/javascript" src="jquery-1.7.1.min.js"></script>
+		<script type="text/javascript" src="jquery-ui-1.8.14.custom.min.js"></script>
+		<script type="text/javascript" src="/socket.io/socket.io.js"></script>
+		<script type="text/javascript" src="5x5client.js"></script>
+		<link rel="stylesheet" type="text/css" href="./style.css" /> 
+	</head>
+	<body>
+		<div id="message"></div>
+		<div id="timer"></div>
+		<div id="grid"></div>
+		<table id="scores">
+			<tr>
+				<th id="p1name" class="name"></th>
+				<th id="p2name" class="name"></th>
+			</tr>
+			<tr>
+				<td id="p1score"></td>
+				<td id="p2score"></td>
+			</tr>
+		</table>
+		<table id="usedwords">
+			<tr>
+				<th id="utitle">Notuð orð</th>
+			</tr>
+			<tr>
+				<td id="uwords"></td>
+			</tr>
+		</table>	
+	</body>
+</html>

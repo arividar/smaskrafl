@@ -1,0 +1,165 @@
+/* Meyer reset from http://meyerweb.com/eric/tools/css/reset/ (public domain) */
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, font, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	outline: 0;
+	font-size: 100%;
+	vertical-align: baseline;
+	background: transparent;
+}
+body {
+	line-height: 1;
+}
+ol, ul {
+	list-style: none;
+}
+blockquote, q {
+	quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+	content: '';
+	content: none;
+}
+
+/* remember to define focus styles! */
+:focus {
+	outline: 0;
+}
+
+/* remember to highlight inserts somehow! */
+ins {
+	text-decoration: none;
+}
+del {
+	text-decoration: line-through;
+}
+
+/* tables still need 'cellspacing="0"' in the markup */
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+
+/* 5x5 styles */
+
+body {
+   font-family: Monaco, "DejaVu Sans Mono", "Lucida Console", monospace;
+}
+
+/* START:message */
+#message {
+  position: relative;
+  text-align: center;
+  margin: 10px;
+  font-size: 22px;
+}
+/* END:message */
+
+#grid {
+  position: relative;
+  text-align: center;
+  width: 576px; 
+  margin: 16px auto;
+  padding: 32px 0;
+  border: 2px solid #555;
+  font-size: 64px;
+  font-family: Monaco, "DejaVu Sans Mono", "Lucida Console", monospace;
+}
+
+/* START:gridUl */
+#grid.turnColorRed li:hover {
+   color: #000;
+   background: #d32;
+}
+
+#grid.turnColorGreen li:hover {
+   color: #000;
+   background: #ac1;
+}
+
+#grid.turnColorYellow li:hover {
+   color: #000;
+   background: FFFFB6;
+}
+
+#grid ul {
+  list-style: none;
+  line-height: 1.2;
+}
+
+#grid li {
+  display: inline;
+  margin: 8px 4px;
+  padding: 0 20px;
+  cursor: pointer;
+}
+
+#grid li:hover {
+  color: #000;
+  background: #ac1;
+}
+
+#grid li.selected {
+  color: #fff;
+  background: #ac1;
+}
+
+.notice, .error {
+  position: relative;
+  text-align: center;
+  width: 576px;
+  margin: 0 auto;
+  padding: 16px 0;
+  font-size: 18px;
+}
+.error {
+  background: #d43;
+}
+
+#scores {
+  position: relative;
+  text-align: center;
+  width: 576px;
+  margin: 16px auto;
+  font-size: 24px;
+}
+#scores th.name {
+	width:50%;
+}
+
+#usedwords {
+	position: relative;
+	text-align: left;
+	width: 576px;
+	margin: 16px auto;
+	background: #ccc;
+	font-size: 18px;
+}
+
+#usedwords td {
+	padding: 10px;
+}
+
+#utitle {
+	padding: 10px;
+	text-align: center;
+}
+
+#timer {
+  position: absolute;
+  right: 0px;
+  top: 0px;
+  margin: 10px;
+  font-size: 24px;	
+}
