@@ -1,13 +1,44 @@
 socket = tiles = selectedCoordinates = myNum = myTurn = usedWords = turnTime = null
+turnColorGreen = "#ac1"
+turnColorRed = "#d32"
+turnColorYellow = "#FFFFB6"
+turnColor = turnColorGreen
+
+iceHTMLChar = (c) ->
+	switch c
+		when 'Á' then '&Aacute;'
+		when 'Ð' then '&ETH;'
+		when 'É' then '&Eacute;'
+		when 'Í' then '&Iacute;'
+		when 'Ó' then '&Oacute;'
+		when 'Ú' then '&Uacute;'
+		when 'Ý' then '&Yacute;'
+		when 'Þ' then '&THORN;'
+		when 'Æ' then '&AElig;'
+		when 'Ö' then '&Ouml;'
+		when 'á' then '&#225;'
+		when 'ð' then '&#240;'
+		when 'é' then '&#233;'
+		when 'í' then '&#237;'
+		when 'ó' then '&#243;'
+		when 'ý' then '&#253;'
+		when 'þ' then '&#254;'
+		when 'æ' then '&#230;'
+		when 'ö' then '&#246;'
+		else c
 
 # forced = true when last turn ended because a player took too long
 startTurn = (forced = false) ->
 	myTurn = true
+	$('#grid').removeClass('turnColorRed turnColorYellow')
+		.addClass('turnColorGreen')
 	if forced is false then showMessage 'firstTile' else showMessage 'yourTurnNow'
 
 endTurn = (forced = false) ->
 	selectedCoordinates = null
 	myTurn = false
+	$('#grid').removeClass('turnColorGreen turnColorYellow')
+		.addClass('turnColorRed')
 	if forced is false then showMessage 'waitForMove' else showMessage 'timeIsUp'
 
 drawTiles = (x1, y1, x2, y2) ->
@@ -15,33 +46,40 @@ drawTiles = (x1, y1, x2, y2) ->
 	for x in [0...tiles.length]
 		gridHtml += '<ul>'
 		for y in [0...tiles.length]
-	  	gridHtml += "<li id='tile#{x}_#{y}'>#{tiles[x][y]}</li>"
+			gridHtml += "<li id='tile#{x}_#{y}'>#{iceHTMLChar(tiles[x][y])}</li>"
 		gridHtml += '</ul>'
 	# draw the grid and highlight the recently swapped tiles
 	$('#grid').html(gridHtml)
 		.find("li#tile#{x1}_#{y1}").add("li#tile#{x2}_#{y2}")
-		.effect("highlight", color: "#eb4", 5500)
+		.effect("highlight", color: turnColor, 5500)
 		
 showMessage = (messageType) ->
+	effectColor = "#FFF"
 	switch messageType
 		when 'waitForConnection'
-			messageHtml = "Waiting for another player to connect to the server..."
+			messageHtml = "Bíð eftir að mótspilara."
 			$('#usedwords, #grid, #scores').hide()
 		when 'waitForMove'
-			messageHtml = "Waiting for the other player to make a move..."
+			messageHtml = "Bíð eftir að mótspilarinn leiki."
 		when 'firstTile'
-			messageHtml = "Please select your first tile."
+			messageHtml = "Veldu fyrri stafinn."
+			effectColor = "#ac1"
 		when 'secondTile'
-			messageHtml = "Please select a second tile."
+			messageHtml = "Veldu seinni stafinn."
+			effectColor = turnColorGreen
 		when 'timeIsUp'
-			messageHtml = "You lost your turn because you took too long."
+			messageHtml = "þú féllst á tíma. Mótspilarinn á leik."
+			effectColor = turnColorRed
 		when 'yourTurnNow'
-			messageHtml = "Your turn because your opponent took too long."
+			messageHtml = "Þú átt leik. Mótspilarinn féll á tíma."
+			effectColor = turnColorGreen
 		when 'opponentQuit'
-			messageHtml = "Opponent quit. Waiting for another play to connect..."
+			messageHtml = "Mótspilari þinn er hættur. Bíð eftur nýjum mótspilara."
 			$('#usedwords, #grid, #scores').hide()
 	$('#message').html messageHtml
-	
+	$('#message').effect("highlight", color: "#{effectColor}", 5500)
+
+
 tileClick = ->
 	return unless myTurn
 	$this = $(this)
@@ -74,16 +112,13 @@ updateUsedWords = (newWords) ->
 	# otherwise only update usedWords if there are newWords formed during move
 	else if newWords.wordsHtml.length > 0
 		usedWords.wordsHtml = usedWords.wordsHtml.concat(", " + newWords.wordsHtml)
-		usedWords.defs = $.extend(usedWords.defs, newWords.defs)	
 	$('#uwords').html usedWords.wordsHtml
-	$('a').hover -> $('#udefinition').html usedWords.defs[$(this).html()]
 	
 handleMessage = (message) ->
 	{type, content} = typeAndContent message
 	switch type
-		when 'welcome' 
-			{players, currPlayerNum, tiles, yourNum: myNum, newWords, turnTime} = 
-			JSON.parse content
+		when 'welcome'
+			{players, currPlayerNum, tiles, yourNum: myNum, newWords, turnTime} = JSON.parse content
 			startGame players, currPlayerNum
 			# update page
 			$('#usedwords, #grid, #scores').show()
@@ -100,13 +135,16 @@ handleMessage = (message) ->
 			endTurn(true)
 		when 'yourTurnNow'
 			startTurn(true)
-		when 'tick'			
+		when 'tick'
 			tick = JSON.parse content
 			# tick for first tick of turn, tock for others
-			if tick is "tick" 
-				$('#timer').html turnTime 
-			else 
-				$('#timer').html parseInt($('#timer').html()) - 1 
+			if tick is "tick"
+				$('#timer').html turnTime
+				if turnTime <= 5
+					$('#grid').removeClass('turnColorRed turnColorGreen')
+						.addClass('turnColorYellow') 
+			else
+				$('#timer').html parseInt($('#timer').html()) - 1
 			
 typeAndContent = (message) ->
 	[ignore, type, content] = message.match /(.*?):(.*)/
@@ -114,26 +152,32 @@ typeAndContent = (message) ->
 
 getPlayerName = (player) ->
 	name = null
-	if player.num is myNum then name = "You" else name = "Opponent"
+	if player.num is myNum then name = "Þú" else name = "Mótspilari"
 
 toArray = (newWords) ->
 	words = []
-	words.push key for key, value of newWords.defs 
+	words.push key for key, value of newWords.defs
 	words
 	
 showNotice = (moveScore, newWords, player) ->
 	words = toArray(newWords)
 	$notice = $("<p class='notice'></p>")
 	if moveScore is 0
-		$notice.html "#{getPlayerName player} formed no words this turn."
+		if player.num is myNum
+			$notice.html "Þú fannst engin ný orð í þetta sinn."
+		else
+			$notice.html "#{getPlayerName player} fann engin ný orð."
 	else
+		fannOrdTexti = "#{getPlayerName player} fann "
+		if player.num is myNum
+			fannOrdTexti = "Þú fannst "
 		$notice.html """ 
-			#{getPlayerName player} formed the following #{words.length} word(s):<br /> 
+			#{fannOrdTexti} #{words.length} orð:<br /> 
 			<b>#{words.join(', ')}</b><br /> 
-			earning <b>#{moveScore / words.length}x#{words.length}
-			= #{moveScore}</b> points!
+			sem gefur <b>#{moveScore / words.length}x#{words.length}
+			= #{moveScore}</b> stig!
 		"""
-	showThenFade $notice	
+	showThenFade $notice
 
 showThenFade = ($elem) ->
 	$elem.insertAfter $('#grid')
@@ -144,11 +188,11 @@ startGame = (players, currPlayerNum) ->
 		$("#p#{player.num}name").html getPlayerName player
 		$("#p#{player.num}score").html player.score
 	drawTiles()
-	if myNum is currPlayerNum then startTurn() 
+	if myNum is currPlayerNum then startTurn()
 	else endTurn()
 
-showMoveResult = (player, swapCoordinates, moveScore, newWords) -> 
-	$("#p#{player.num}score").html player.score 
+showMoveResult = (player, swapCoordinates, moveScore, newWords) ->
+	$("#p#{player.num}score").html player.score
 	showNotice moveScore, newWords, player
 	swapTiles swapCoordinates
 	if player.num isnt myNum then startTurn()

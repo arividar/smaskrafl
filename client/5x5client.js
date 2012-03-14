@@ -1,76 +1,139 @@
 (function() {
-  var drawTiles, endTurn, getPlayerName, handleMessage, myNum, myTurn, selectedCoordinates, showMessage, showMoveResult, showNotice, showThenFade, socket, startGame, startTurn, swapTiles, tileClick, tiles, toArray, turnTime, typeAndContent, updateUsedWords, usedWords;
+  var drawTiles, endTurn, getPlayerName, handleMessage, iceHTMLChar, myNum, myTurn, selectedCoordinates, showMessage, showMoveResult, showNotice, showThenFade, socket, startGame, startTurn, swapTiles, tileClick, tiles, toArray, turnColor, turnColorGreen, turnColorRed, turnColorYellow, turnTime, typeAndContent, updateUsedWords, usedWords;
+
   socket = tiles = selectedCoordinates = myNum = myTurn = usedWords = turnTime = null;
-  startTurn = function(forced) {
-    if (forced == null) {
-      forced = false;
+
+  turnColorGreen = "#ac1";
+
+  turnColorRed = "#d32";
+
+  turnColorYellow = "#FFFFB6";
+
+  turnColor = turnColorGreen;
+
+  iceHTMLChar = function(c) {
+    switch (c) {
+      case 'Á':
+        return '&Aacute;';
+      case 'Ð':
+        return '&ETH;';
+      case 'É':
+        return '&Eacute;';
+      case 'Í':
+        return '&Iacute;';
+      case 'Ó':
+        return '&Oacute;';
+      case 'Ú':
+        return '&Uacute;';
+      case 'Ý':
+        return '&Yacute;';
+      case 'Þ':
+        return '&THORN;';
+      case 'Æ':
+        return '&AElig;';
+      case 'Ö':
+        return '&Ouml;';
+      case 'á':
+        return '&#225;';
+      case 'ð':
+        return '&#240;';
+      case 'é':
+        return '&#233;';
+      case 'í':
+        return '&#237;';
+      case 'ó':
+        return '&#243;';
+      case 'ý':
+        return '&#253;';
+      case 'þ':
+        return '&#254;';
+      case 'æ':
+        return '&#230;';
+      case 'ö':
+        return '&#246;';
+      default:
+        return c;
     }
+  };
+
+  startTurn = function(forced) {
+    if (forced == null) forced = false;
     myTurn = true;
+    $('#grid').removeClass('turnColorRed turnColorYellow').addClass('turnColorGreen');
     if (forced === false) {
       return showMessage('firstTile');
     } else {
       return showMessage('yourTurnNow');
     }
   };
+
   endTurn = function(forced) {
-    if (forced == null) {
-      forced = false;
-    }
+    if (forced == null) forced = false;
     selectedCoordinates = null;
     myTurn = false;
+    $('#grid').removeClass('turnColorGreen turnColorYellow').addClass('turnColorRed');
     if (forced === false) {
       return showMessage('waitForMove');
     } else {
       return showMessage('timeIsUp');
     }
   };
+
   drawTiles = function(x1, y1, x2, y2) {
     var gridHtml, x, y, _ref, _ref2;
     gridHtml = '';
     for (x = 0, _ref = tiles.length; 0 <= _ref ? x < _ref : x > _ref; 0 <= _ref ? x++ : x--) {
       gridHtml += '<ul>';
       for (y = 0, _ref2 = tiles.length; 0 <= _ref2 ? y < _ref2 : y > _ref2; 0 <= _ref2 ? y++ : y--) {
-        gridHtml += "<li id='tile" + x + "_" + y + "'>" + tiles[x][y] + "</li>";
+        gridHtml += "<li id='tile" + x + "_" + y + "'>" + (iceHTMLChar(tiles[x][y])) + "</li>";
       }
       gridHtml += '</ul>';
     }
     return $('#grid').html(gridHtml).find("li#tile" + x1 + "_" + y1).add("li#tile" + x2 + "_" + y2).effect("highlight", {
-      color: "#eb4"
+      color: turnColor
     }, 5500);
   };
+
   showMessage = function(messageType) {
-    var messageHtml;
+    var effectColor, messageHtml;
+    effectColor = "#FFF";
     switch (messageType) {
       case 'waitForConnection':
-        messageHtml = "Waiting for another player to connect to the server...";
+        messageHtml = "Bíð eftir að mótspilara.";
         $('#usedwords, #grid, #scores').hide();
         break;
       case 'waitForMove':
-        messageHtml = "Waiting for the other player to make a move...";
+        messageHtml = "Bíð eftir að mótspilarinn leiki.";
         break;
       case 'firstTile':
-        messageHtml = "Please select your first tile.";
+        messageHtml = "Veldu fyrri stafinn.";
+        effectColor = "#ac1";
         break;
       case 'secondTile':
-        messageHtml = "Please select a second tile.";
+        messageHtml = "Veldu seinni stafinn.";
+        effectColor = turnColorGreen;
         break;
       case 'timeIsUp':
-        messageHtml = "You lost your turn because you took too long.";
+        messageHtml = "þú féllst á tíma. Mótspilarinn á leik.";
+        effectColor = turnColorRed;
         break;
       case 'yourTurnNow':
-        messageHtml = "Your turn because your opponent took too long.";
+        messageHtml = "Þú átt leik. Mótspilarinn féll á tíma.";
+        effectColor = turnColorGreen;
         break;
       case 'opponentQuit':
-        messageHtml = "Opponent quit. Waiting for another play to connect...";
+        messageHtml = "Mótspilari þinn er hættur. Bíð eftur nýjum mótspilara.";
         $('#usedwords, #grid, #scores').hide();
     }
-    return $('#message').html(messageHtml);
+    $('#message').html(messageHtml);
+    return $('#message').effect("highlight", {
+      color: "" + effectColor
+    }, 5500);
   };
+
   tileClick = function() {
     var $this, x, y, _ref;
-    if (!myTurn) {
-      return;
-    }
+    if (!myTurn) return;
     $this = $(this);
     if ($this.hasClass('selected')) {
       selectedCoordinates = null;
@@ -93,25 +156,24 @@
       }
     }
   };
+
   swapTiles = function(_arg) {
     var x1, x2, y1, y2, _ref;
     x1 = _arg.x1, y1 = _arg.y1, x2 = _arg.x2, y2 = _arg.y2;
     _ref = [tiles[x2][y2], tiles[x1][y1]], tiles[x1][y1] = _ref[0], tiles[x2][y2] = _ref[1];
     return drawTiles(x1, y1, x2, y2);
   };
+
   updateUsedWords = function(newWords) {
     var _ref;
     if (Object.keys(usedWords).length === 0) {
       _ref = [newWords.wordsHtml, newWords.defs], usedWords.wordsHtml = _ref[0], usedWords.defs = _ref[1];
     } else if (newWords.wordsHtml.length > 0) {
       usedWords.wordsHtml = usedWords.wordsHtml.concat(", " + newWords.wordsHtml);
-      usedWords.defs = $.extend(usedWords.defs, newWords.defs);
     }
-    $('#uwords').html(usedWords.wordsHtml);
-    return $('a').hover(function() {
-      return $('#udefinition').html(usedWords.defs[$(this).html()]);
-    });
+    return $('#uwords').html(usedWords.wordsHtml);
   };
+
   handleMessage = function(message) {
     var content, currPlayerNum, moveScore, newWords, player, players, swapCoordinates, tick, type, _ref, _ref2, _ref3;
     _ref = typeAndContent(message), type = _ref.type, content = _ref.content;
@@ -136,12 +198,16 @@
       case 'tick':
         tick = JSON.parse(content);
         if (tick === "tick") {
-          return $('#timer').html(turnTime);
+          $('#timer').html(turnTime);
+          if (turnTime <= 5) {
+            return $('#grid').removeClass('turnColorRed turnColorGreen').addClass('turnColorYellow');
+          }
         } else {
           return $('#timer').html(parseInt($('#timer').html()) - 1);
         }
     }
   };
+
   typeAndContent = function(message) {
     var content, ignore, type, _ref;
     _ref = message.match(/(.*?):(.*)/), ignore = _ref[0], type = _ref[1], content = _ref[2];
@@ -150,15 +216,17 @@
       content: content
     };
   };
+
   getPlayerName = function(player) {
     var name;
     name = null;
     if (player.num === myNum) {
-      return name = "You";
+      return name = "Þú";
     } else {
-      return name = "Opponent";
+      return name = "Mótspilari";
     }
   };
+
   toArray = function(newWords) {
     var key, value, words, _ref;
     words = [];
@@ -169,17 +237,25 @@
     }
     return words;
   };
+
   showNotice = function(moveScore, newWords, player) {
-    var $notice, words;
+    var $notice, fannOrdTexti, words;
     words = toArray(newWords);
     $notice = $("<p class='notice'></p>");
     if (moveScore === 0) {
-      $notice.html("" + (getPlayerName(player)) + " formed no words this turn.");
+      if (player.num === myNum) {
+        $notice.html("Þú fannst engin ný orð í þetta sinn.");
+      } else {
+        $notice.html("" + (getPlayerName(player)) + " fann engin ný orð.");
+      }
     } else {
-      $notice.html(" \n" + (getPlayerName(player)) + " formed the following " + words.length + " word(s):<br /> \n<b>" + (words.join(', ')) + "</b><br /> \nearning <b>" + (moveScore / words.length) + "x" + words.length + "\n= " + moveScore + "</b> points!");
+      fannOrdTexti = "" + (getPlayerName(player)) + " fann ";
+      if (player.num === myNum) fannOrdTexti = "Þú fannst ";
+      $notice.html(" \n" + fannOrdTexti + " " + words.length + " orð:<br /> \n<b>" + (words.join(', ')) + "</b><br /> \nsem gefur <b>" + (moveScore / words.length) + "x" + words.length + "\n= " + moveScore + "</b> stig!");
     }
     return showThenFade($notice);
   };
+
   showThenFade = function($elem) {
     $elem.insertAfter($('#grid'));
     return $elem.effect("highlight", {
@@ -188,6 +264,7 @@
       return $elem.remove();
     });
   };
+
   startGame = function(players, currPlayerNum) {
     var player, _i, _len;
     for (_i = 0, _len = players.length; _i < _len; _i++) {
@@ -202,14 +279,14 @@
       return endTurn();
     }
   };
+
   showMoveResult = function(player, swapCoordinates, moveScore, newWords) {
     $("#p" + player.num + "score").html(player.score);
     showNotice(moveScore, newWords, player);
     swapTiles(swapCoordinates);
-    if (player.num !== myNum) {
-      return startTurn();
-    }
+    if (player.num !== myNum) return startTurn();
   };
+
   $(document).ready(function() {
     $('#grid li').live('click', tileClick);
     socket = io.connect();
@@ -218,4 +295,5 @@
     });
     return socket.on('message', handleMessage);
   });
+
 }).call(this);

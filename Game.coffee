@@ -1,9 +1,7 @@
-#START:imports
 {Dictionary} = require './Dictionary'
 {Grid} = require './Grid'
-{Words} = require './OWL2'
+{Words} = require './nonfetlc.js'
 {Player} = require './Player'
-#END:imports
 
 class Game
 	@TURN_TIME = 30000 #milliseconds

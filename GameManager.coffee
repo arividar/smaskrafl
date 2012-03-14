@@ -3,20 +3,20 @@
 # Manages creation and deletion of games
 class GameManager
 	constructor: ->
-		@games = []		
+		@games = []
 		@words = null
 	
 	getNextAvailableGame: ->
 		# if there aren't any games, create a new one
 		if @games.length is 0
 			@games.push new Game
-			@words = @games[0].dictionary.originalWordList			
+			@words = @games[0].dictionary.originalWordList
 		# or if all games are full, create a new one 		
 		else if @games[@games.length - 1].isFull()
 			@games.push new Game
 		# otherwise check if we are re-using old game and reset if necessary
 		else if @games[@games.length - 1].wasPlayed is true
-			@games[@games.length - 1].reset()			
+			@games[@games.length - 1].reset()
 		@games[@games.length - 1]
 		
 	getGameWithPlayer: (client) ->
