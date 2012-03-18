@@ -17,6 +17,7 @@ class GameManager
 		# otherwise check if we are re-using old game and reset if necessary
 		else if @games[@games.length - 1].wasPlayed is true
 			@games[@games.length - 1].reset()
+		console.log "************************* Find next available game: #{@games.length}"
 		@games[@games.length - 1]
 		
 	getGameWithPlayer: (client) ->
@@ -39,20 +40,18 @@ class GameManager
 	
 		# find games with 1 player, i.e. orphans
 		orphanedGames = []
-		for game in @games 
-			orphanedGames.push game if @numberOfPlayers(game) is 1	
+		for game in @games
+			orphanedGames.push game if @numberOfPlayers(game) is 1
 
 		if orphanedGames.length is 2 # two games with 1 player each = 1 full game 
 			# move high player to low game
-			playerToMove = 
-				player for player in orphanedGames[1].players when player.id isnt null
+			playerToMove = player for player in orphanedGames[1].players when player.id isnt null
 			orphanedGames[0].addPlayer playerToMove.id
 			# reset names and nums
-			[player.name, player.num] = 
-				["Player#{i}", "#{i}"] for player, i in orphanedGames[0]			
+			[player.name, player.num] = ["Player#{i}", "#{i}"] for player, i in orphanedGames[0]
 			# purge highest orphaned game and reset game for players
-			@games.pop(orphanedGames[1])	
-			orphanedGames[0].reset()	
+			@games.pop(orphanedGames[1])
+			orphanedGames[0].reset()
 			# welcome orphans to game		
 			callback orphanedGames[0]
 								

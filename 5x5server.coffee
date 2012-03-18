@@ -1,4 +1,3 @@
-# START
 {Game} = require './Game'
 {GameManager} = require './GameManager'
 express = require 'express'
@@ -14,7 +13,6 @@ idClientMap = {}
 
 console.log 'CoffeeDir: ' + __dirname
 
-# changed for Heroku
 port = process.env.PORT || 3000
 console.log 'Listening to port '+port
 app.listen port
@@ -25,7 +23,8 @@ socket = io.listen app
 
 socket.sockets.on 'connection', (client) ->
 	assignToGame client
-	client.on 'message', (message) -> handleMessage client, message
+	client.on 'message', (message) ->
+		handleMessage client, message
 	client.on 'disconnect', ->
 		removeFromGame client
 
@@ -33,7 +32,8 @@ assignToGame = (client) ->
 	idClientMap[client.id] = client
 	game = gameManager.getNextAvailableGame()
 	game.addPlayer client.id
-	if game.isFull() then welcomePlayers(game)
+	if game.isFull()
+		welcomePlayers(game)
 
 removeFromGame = (client) ->
 	delete idClientMap[client.id]
@@ -84,7 +84,7 @@ welcomePlayers = (game) ->
 	for player in game.players
 		playerInfo = extend {}, info, {yourNum: player.num}
 		idClientMap[player.id].send "welcome:#{JSON.stringify playerInfo}"
-		console.log "welcome:#{JSON.stringify playerInfo}"
+		console.log "***************** WELCOME PLAYER: #{player.id}"
  
 	
 	# reset things just to be safe - could be an old game getting recycled

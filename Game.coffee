@@ -1,7 +1,7 @@
 {Dictionary} = require './Dictionary'
 {Grid} = require './Grid'
-{Words} = require './nonfetlc.js'
 {Player} = require './Player'
+{Words} = require './nonfetlc.js'
 
 class Game
 	@TURN_TIME = 30000 #milliseconds

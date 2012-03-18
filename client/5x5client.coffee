@@ -142,7 +142,7 @@ handleMessage = (message) ->
 				$('#timer').html turnTime
 				if turnTime <= 5
 					$('#grid').removeClass('turnColorRed turnColorGreen')
-						.addClass('turnColorYellow') 
+						.addClass('turnColorYellow')
 			else
 				$('#timer').html parseInt($('#timer').html()) - 1
 			
