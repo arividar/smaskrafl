@@ -32,14 +32,16 @@ startTurn = (forced = false) ->
 	myTurn = true
 	$('#grid').removeClass('turnColorRed turnColorYellow')
 		.addClass('turnColorGreen')
-	if forced is false then showMessage 'firstTile' else showMessage 'yourTurnNow'
+	if forced is false
+		showMessage 'firstTile' else showMessage 'yourTurnNow'
 
 endTurn = (forced = false) ->
 	selectedCoordinates = null
 	myTurn = false
 	$('#grid').removeClass('turnColorGreen turnColorYellow')
 		.addClass('turnColorRed')
-	if forced is false then showMessage 'waitForMove' else showMessage 'timeIsUp'
+	if forced is false
+		howMessage 'waitForMove' else showMessage 'timeIsUp'
 
 drawTiles = (x1, y1, x2, y2) ->
 	gridHtml = ''
