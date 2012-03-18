@@ -51,26 +51,23 @@ table {
 	border-spacing: 0;
 }
 
-/* 5x5 styles */
 body {
    font-family: Monaco, "DejaVu Sans Mono", "Lucida Console", monospace;
 }
 
-/* START:message */
 #message {
   position: relative;
   text-align: center;
   margin: 10px;
   font-size: 22px;
 }
-/* END:message */
 
 #grid {
   position: relative;
   text-align: center;
-  width: 480px; 
-  margin: 12px auto;
-  padding: 24px 0;
+  width: 100%; 
+  margin: 0px 0px;
+  padding: 12px 0px;
   border: 2px solid #555;
   font-size: 48px;
   font-family: Monaco, "DejaVu Sans Mono", "Lucida Console", monospace;

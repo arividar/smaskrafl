@@ -7,9 +7,9 @@ turnColor = turnColorGreen
 iceHTMLChar = (c) ->
 	switch c
 		when 'Á' then '&Aacute;'
-		when 'Ð' then '&ETH;'
+		when 'Ð' then '&ETH;'
 		when 'É' then '&Eacute;'
-		when 'Í' then '&Iacute;'
+		when 'Í' then '&Iacute;'
 		when 'Ó' then '&Oacute;'
 		when 'Ú' then '&Uacute;'
 		when 'Ý' then '&Yacute;'
