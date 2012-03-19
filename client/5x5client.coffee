@@ -30,8 +30,8 @@ iceHTMLChar = (c) ->
 # forced = true when last turn ended because a player took too long
 startTurn = (forced = false) ->
 	myTurn = true
-	$('#grid').removeClass('turnColorRed turnColorYellow')
-		.addClass('turnColorGreen')
+	$('#grid').removeClass('turnColorRed turnColorYellow').addClass('turnColorGreen')
+	$('#p1Score').removeClass('colorRed colorYellow').addClass('colorGreen')
 	if forced is false
 		showMessage 'firstTile'
 	else
@@ -40,8 +40,8 @@ startTurn = (forced = false) ->
 endTurn = (forced = false) ->
 	selectedCoordinates = null
 	myTurn = false
-	$('#grid').removeClass('turnColorGreen turnColorYellow')
-		.addClass('turnColorRed')
+	$('#grid').removeClass('turnColorGreen turnColorYellow').addClass('turnColorRed')
+	$('#p2Score').removeClass('colorGreen colorYellow').addClass('colorRed')
 	if forced is false
 		showMessage 'waitForMove'
 	else
@@ -117,7 +117,7 @@ updateUsedWords = (newWords) ->
 	# otherwise only update usedWords if there are newWords formed during move
 	else if newWords.wordsHtml.length > 0
 		usedWords.wordsHtml = usedWords.wordsHtml.concat(", " + newWords.wordsHtml)
-	$('#uwords').html usedWords.wordsHtml
+	$('#usedwords').html usedWords.wordsHtml
 	
 handleMessage = (message) ->
 	{type, content} = typeAndContent message
@@ -127,7 +127,7 @@ handleMessage = (message) ->
 			startGame players, currPlayerNum
 			# update page
 			$('#usedwords, #grid, #scores').show()
-			$('#uwords').html ""
+			$('#usedwords').html ""
 			usedWords = {}
 			updateUsedWords newWords
 		when 'moveResult'
@@ -193,8 +193,8 @@ showThenFade = ($elem) ->
 	
 startGame = (players, currPlayerNum) ->
 	for player in players
-		$("#p#{player.num}name").html getPlayerName player
-		$("#p#{player.num}score").html player.score
+		$("#p#{player.num}Name").html getPlayerName player
+		$("#p#{player.num}Score").html player.score
 	drawTiles()
 	if myNum is currPlayerNum
 		startTurn()
@@ -202,7 +202,7 @@ startGame = (players, currPlayerNum) ->
 		endTurn()
 
 showMoveResult = (player, swapCoordinates, moveScore, newWords) ->
-	$("#p#{player.num}score").html player.score
+	$("#p#{player.num}Score").html player.score
 	showNotice moveScore, newWords, player
 	swapTiles swapCoordinates
 	if player.num isnt myNum

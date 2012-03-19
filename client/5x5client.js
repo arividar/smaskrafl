@@ -60,6 +60,7 @@
     if (forced == null) forced = false;
     myTurn = true;
     $('#grid').removeClass('turnColorRed turnColorYellow').addClass('turnColorGreen');
+    $('#p1Score').removeClass('colorRed colorYellow').addClass('colorGreen');
     if (forced === false) {
       return showMessage('firstTile');
     } else {
@@ -72,6 +73,7 @@
     selectedCoordinates = null;
     myTurn = false;
     $('#grid').removeClass('turnColorGreen turnColorYellow').addClass('turnColorRed');
+    $('#p2Score').removeClass('colorGreen colorYellow').addClass('colorRed');
     if (forced === false) {
       return showMessage('waitForMove');
     } else {
@@ -171,7 +173,7 @@
     } else if (newWords.wordsHtml.length > 0) {
       usedWords.wordsHtml = usedWords.wordsHtml.concat(", " + newWords.wordsHtml);
     }
-    return $('#uwords').html(usedWords.wordsHtml);
+    return $('#usedwords').html(usedWords.wordsHtml);
   };
 
   handleMessage = function(message) {
@@ -182,7 +184,7 @@
         _ref2 = JSON.parse(content), players = _ref2.players, currPlayerNum = _ref2.currPlayerNum, tiles = _ref2.tiles, myNum = _ref2.yourNum, newWords = _ref2.newWords, turnTime = _ref2.turnTime;
         startGame(players, currPlayerNum);
         $('#usedwords, #grid, #scores').show();
-        $('#uwords').html("");
+        $('#usedwords').html("");
         usedWords = {};
         return updateUsedWords(newWords);
       case 'moveResult':
@@ -269,8 +271,8 @@
     var player, _i, _len;
     for (_i = 0, _len = players.length; _i < _len; _i++) {
       player = players[_i];
-      $("#p" + player.num + "name").html(getPlayerName(player));
-      $("#p" + player.num + "score").html(player.score);
+      $("#p" + player.num + "Name").html(getPlayerName(player));
+      $("#p" + player.num + "Score").html(player.score);
     }
     drawTiles();
     if (myNum === currPlayerNum) {
@@ -281,7 +283,7 @@
   };
 
   showMoveResult = function(player, swapCoordinates, moveScore, newWords) {
-    $("#p" + player.num + "score").html(player.score);
+    $("#p" + player.num + "Score").html(player.score);
     showNotice(moveScore, newWords, player);
     swapTiles(swapCoordinates);
     if (player.num !== myNum) return startTurn();

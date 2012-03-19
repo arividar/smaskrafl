@@ -50,61 +50,76 @@ table {
 }
 
 body {
-   font-family: Monaco, "DejaVu Sans Mono", "Lucida Console", monospace;
+	font-family: Monaco, "DejaVu Sans Mono", "Lucida Console", monospace;
 }
 
 #message {
-  position: relative;
-  text-align: center;
-  margin: 10px;
-  font-size: 22px;
+	position: relative;
+	text-align: center;
+	margin: 10px;
+	font-size: 22px;
 }
 
 #grid {
-  position: relative;
-  text-align: center;
-  margin: 0px 0px;
-  padding: 12px 0px;
-  border: 2px solid #555;
-  font-size: 48px;
-  font-family: Monaco, "DejaVu Sans Mono", "Lucida Console", monospace;
+	position: relative;
+	text-align: center;
+	margin: 0px 0px;
+	padding: 12px 0px;
+	border: 2px solid #555;
+	font-size: 48px;
+	font-family: Monaco, "DejaVu Sans Mono", "Lucida Console", monospace;
 }
 
 #grid.turnColorRed li:hover {
-   color: #530;
-   background: #d32;
+	color: #530;
+	background: #d32;
 }
 
 #grid.turnColorGreen li:hover {
-   color: #000;
-   background: #ac1;
+	color: #000;
+	background: #ac1;
 }
 
 #grid.turnColorYellow li:hover {
-   color: #000;
-   background: FFFFB6;
+	color: #000;
+	background: FFFFB6;
 }
 
 #grid ul {
-  list-style: none;
-  line-height: 1.2;
+	list-style: none;
+	line-height: 1.2;
 }
 
 #grid li {
-  display: inline;
-  margin: 8px 4px;
-  padding: 0 20px;
-  cursor: pointer;
+	display: inline;
+	margin: 8px 4px;
+	padding: 0 20px;
+	cursor: pointer;
 }
 
 #grid li:hover {
-  color: #000;
-  background: #ac1;
+	color: #000;
+	background: #ac1;
 }
 
 #grid li.selected {
-  color: #fff;
-  background: #ac1;
+	color: #fff;
+	background: #ac1;
+}
+
+.colorRed {
+	color: #530;
+	background: #d32;
+}
+
+.colorGreen {
+	color: #000;
+	background: #ac1;
+}
+
+.colorYellow {
+	color: #000;
+	background: FFFFB6;
 }
 
 .score {
@@ -112,42 +127,42 @@ body {
 	width: 90px;
 	height: 48px;
 	font-size: 38px;
-	background: #444;
-	color: #fff;
 }
 
 .notice, .error {
-  position: relative;
-  text-align: center;
-  margin: 0 auto;
-  padding: 16px 0;
-  font-size: 18px;
+	position: relative;
+	text-align: center;
+	margin: 0 auto;
+	padding: 16px 0;
+	font-size: 18px;
 }
+
 .error {
-  background: #d43;
+	background: #d43;
+}
+
+#utitle {
+	padding: 4px;
+	text-align: center;
+	font-weight: bold;
+	font-size: 18px;
 }
 
 #usedwords {
 	position: relative;
 	text-align: left;
-	margin: 16px auto;
+	margin: 8px auto;
 	background: #ccc;
-	font-size: 18px;
-}
-
-#usedwords td {
-	padding: 10px;
-}
-
-#utitle {
-	padding: 10px;
-	text-align: center;
+	font-size: 16px;
+	padding: 12px;
 }
 
 #timer {
-  position: absolute;
-  right: 0px;
-  top: 0px;
-  margin: 10px;
-  font-size: 24px;	
+	padding: 5px 5px 2px 5px;
+	width: 44px;
+	height: 44px;
+	font-size: 32px;
+	background: #444;
+	color: #fff;
+	margin: 4px;
 }

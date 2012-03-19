@@ -1,6 +1,6 @@
 <html>
 	<head>
-		<title>Multiplayer 5x5</title>
+		<title>multiplayer 5x5</title>
 		<script type="text/javascript" src="jquery-1.7.1.min.js"></script>
 		<script type="text/javascript" src="jquery-ui-1.8.14.custom.min.js"></script>
 		<script type="text/javascript" src="/socket.io/socket.io.js"></script>
@@ -8,26 +8,26 @@
 		<link rel="stylesheet" type="text/css" href="./style.css" /> 
 	</head>
 	<body>
-		
-		<div id="timer"></div>
 		<div id="message"></div>
-		<table id="gridTable" width="100%">
+		<table id="gridtable" width="100%">
 			<tr>
 				<th id="p1Header"></th>
-				<th id="gridHeader"></th>
+				<th id="gridHeader" align="center">
+					<div id="timer"></div>
+				</th>
 				<th id="p2Header"></th>
 			</tr>
 			<tr>
 				<td width="40%" id="p1Info" align="center">
-					<div id="p1name" class="name"></div>
-					<div id="p1score" class="score"></div>
+					<div id="p1Name" class="name"></div>
+					<div id="p1Score" class="score" class="colorGreen"></div>
 				</td>
 				<td width="20%">
 					<div id="grid"></div>
 				</td>
 				<td width="40%" id="p2Info" align="center">
-					<div id="p2name" class="name"></div>
-					<div id="p2score" class="score"></div>
+					<div id="p2Name" class="name"></div>
+					<div id="p2Score" class="score" class="colorGreen"></div>
 				</td>
 			</tr>
 			<tr>
@@ -35,7 +35,7 @@
 				</td>
 				<td>
 					<div id="utitle">Öll notuð orð</div>
-					<div id="uwords">
+					<div id="usedwords"></div>
 				</td>
 				<td>
 				</td>
