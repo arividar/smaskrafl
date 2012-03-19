@@ -15,11 +15,11 @@
     switch (c) {
       case 'Á':
         return '&Aacute;';
-      case 'Ð':
+      case 'Ð':
         return '&ETH;';
       case 'É':
         return '&Eacute;';
-      case 'Í':
+      case 'Í':
         return '&Iacute;';
       case 'Ó':
         return '&Oacute;';

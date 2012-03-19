@@ -33,7 +33,9 @@ startTurn = (forced = false) ->
 	$('#grid').removeClass('turnColorRed turnColorYellow')
 		.addClass('turnColorGreen')
 	if forced is false
-		showMessage 'firstTile' else showMessage 'yourTurnNow'
+		showMessage 'firstTile'
+	else
+		showMessage 'yourTurnNow'
 
 endTurn = (forced = false) ->
 	selectedCoordinates = null
@@ -41,7 +43,9 @@ endTurn = (forced = false) ->
 	$('#grid').removeClass('turnColorGreen turnColorYellow')
 		.addClass('turnColorRed')
 	if forced is false
-		howMessage 'waitForMove' else showMessage 'timeIsUp'
+		showMessage 'waitForMove'
+	else
+		showMessage 'timeIsUp'
 
 drawTiles = (x1, y1, x2, y2) ->
 	gridHtml = ''
@@ -80,7 +84,6 @@ showMessage = (messageType) ->
 			$('#usedwords, #grid, #scores').hide()
 	$('#message').html messageHtml
 	$('#message').effect("highlight", color: "#{effectColor}", 5500)
-
 
 tileClick = ->
 	return unless myTurn
@@ -154,7 +157,10 @@ typeAndContent = (message) ->
 
 getPlayerName = (player) ->
 	name = null
-	if player.num is myNum then name = "Þú" else name = "Mótspilari"
+	if player.num is myNum
+		name = "Þú"
+	else
+		name = "Mótspilari"
 
 toArray = (newWords) ->
 	words = []
@@ -190,14 +196,17 @@ startGame = (players, currPlayerNum) ->
 		$("#p#{player.num}name").html getPlayerName player
 		$("#p#{player.num}score").html player.score
 	drawTiles()
-	if myNum is currPlayerNum then startTurn()
-	else endTurn()
+	if myNum is currPlayerNum
+		startTurn()
+	else
+		endTurn()
 
 showMoveResult = (player, swapCoordinates, moveScore, newWords) ->
 	$("#p#{player.num}score").html player.score
 	showNotice moveScore, newWords, player
 	swapTiles swapCoordinates
-	if player.num isnt myNum then startTurn()
+	if player.num isnt myNum
+		startTurn()
 
 $(document).ready ->
 	$('#grid li').live 'click', tileClick
