@@ -70,7 +70,6 @@ body {
   font-family: Monaco, "DejaVu Sans Mono", "Lucida Console", monospace;
 }
 
-/* START:gridUl */
 #grid.turnColorRed li:hover {
    color: #530;
    background: #d32;
@@ -108,10 +107,18 @@ body {
   background: #ac1;
 }
 
+.score {
+	padding: 5px;
+	width: 90px;
+	height: 48px;
+	font-size: 38px;
+	background: #444;
+	color: #fff;
+}
+
 .notice, .error {
   position: relative;
   text-align: center;
-  width: 576px;
   margin: 0 auto;
   padding: 16px 0;
   font-size: 18px;
@@ -123,7 +130,6 @@ body {
 #usedwords {
 	position: relative;
 	text-align: left;
-	width: 576px;
 	margin: 16px auto;
 	background: #ccc;
 	font-size: 18px;
