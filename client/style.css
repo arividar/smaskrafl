@@ -71,13 +71,13 @@ body {
 }
 
 #grid.turnColorRed li:hover {
-	color: #530;
+	color: #fff;
 	background: #d32;
 }
 
 #grid.turnColorGreen li:hover {
-	color: #000;
-	background: #ac1;
+	color: #fff;
+	background: #181;
 }
 
 #grid.turnColorYellow li:hover {
@@ -99,31 +99,35 @@ body {
 
 #grid li:hover {
 	color: #000;
-	background: #ac1;
+	background: #181;
 }
 
 #grid li.selected {
 	color: #fff;
-	background: #ac1;
+	background: #181;
 }
 
 .colorRed {
-	color: #530;
+	color: #fff;
 	background: #d32;
 }
 
 .colorGreen {
-	color: #000;
-	background: #ac1;
+	color: #fff;
+	background: #181;
 }
 
 .colorYellow {
 	color: #000;
-	background: FFFFB6;
+	background: #FFFFB6;
+}
+
+.scoreName {
+	font-size: 24px;
 }
 
 .score {
-	padding: 5px;
+	padding: 5px 5px 0px 5px;
 	width: 90px;
 	height: 48px;
 	font-size: 38px;

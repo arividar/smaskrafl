@@ -3,7 +3,7 @@
 
   socket = tiles = selectedCoordinates = myNum = myTurn = usedWords = turnTime = null;
 
-  turnColorGreen = "#ac1";
+  turnColorGreen = "#181";
 
   turnColorRed = "#d32";
 
@@ -60,7 +60,8 @@
     if (forced == null) forced = false;
     myTurn = true;
     $('#grid').removeClass('turnColorRed turnColorYellow').addClass('turnColorGreen');
-    $('#p1Score').removeClass('colorRed colorYellow').addClass('colorGreen');
+    $('#meScore').removeClass('colorRed colorYellow').addClass('colorGreen');
+    $('#opponentScore').removeClass('colorGreen colorYellow').addClass('colorRed');
     if (forced === false) {
       return showMessage('firstTile');
     } else {
@@ -73,7 +74,8 @@
     selectedCoordinates = null;
     myTurn = false;
     $('#grid').removeClass('turnColorGreen turnColorYellow').addClass('turnColorRed');
-    $('#p2Score').removeClass('colorGreen colorYellow').addClass('colorRed');
+    $('#meScore').removeClass('colorGreen').addClass('colorRed');
+    $('#opponentScore').removeClass('colorRed').addClass('colorGreen');
     if (forced === false) {
       return showMessage('waitForMove');
     } else {
@@ -102,14 +104,14 @@
     switch (messageType) {
       case 'waitForConnection':
         messageHtml = "Bíð eftir að mótspilara.";
-        $('#usedwords, #grid, #scores').hide();
+        $('#usedwords, #grid, #scores #opponentScore #meScore').hide();
         break;
       case 'waitForMove':
         messageHtml = "Bíð eftir að mótspilarinn leiki.";
         break;
       case 'firstTile':
         messageHtml = "Veldu fyrri stafinn.";
-        effectColor = "#ac1";
+        effectColor = turnColorGreen;
         break;
       case 'secondTile':
         messageHtml = "Veldu seinni stafinn.";
@@ -183,7 +185,7 @@
       case 'welcome':
         _ref2 = JSON.parse(content), players = _ref2.players, currPlayerNum = _ref2.currPlayerNum, tiles = _ref2.tiles, myNum = _ref2.yourNum, newWords = _ref2.newWords, turnTime = _ref2.turnTime;
         startGame(players, currPlayerNum);
-        $('#usedwords, #grid, #scores').show();
+        $('#usedwords, #grid, #scores #meScore #opponentScore').show();
         $('#usedwords').html("");
         usedWords = {};
         return updateUsedWords(newWords);
@@ -268,12 +270,10 @@
   };
 
   startGame = function(players, currPlayerNum) {
-    var player, _i, _len;
-    for (_i = 0, _len = players.length; _i < _len; _i++) {
-      player = players[_i];
-      $("#p" + player.num + "Name").html(getPlayerName(player));
-      $("#p" + player.num + "Score").html(player.score);
-    }
+    $("#meName").html(getPlayerName(players[myNum - 1]));
+    $("#meScore").html(players[myNum - 1].score);
+    $("#opponentName").html(getPlayerName(players[2 - myNum]));
+    $("#opponentScore").html(players[2 - myNum].score);
     drawTiles();
     if (myNum === currPlayerNum) {
       return startTurn();
@@ -283,7 +283,11 @@
   };
 
   showMoveResult = function(player, swapCoordinates, moveScore, newWords) {
-    $("#p" + player.num + "Score").html(player.score);
+    if (player.num === myNum) {
+      $("#meScore").html(player.score);
+    } else {
+      $("#opponentScore").html(player.score);
+    }
     showNotice(moveScore, newWords, player);
     swapTiles(swapCoordinates);
     if (player.num !== myNum) return startTurn();
@@ -291,6 +295,7 @@
 
   $(document).ready(function() {
     $('#grid li').live('click', tileClick);
+    $;
     socket = io.connect();
     socket.on('connect', function() {
       return showMessage('waitForConnection');

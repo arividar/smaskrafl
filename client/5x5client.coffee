@@ -1,5 +1,5 @@
 socket = tiles = selectedCoordinates = myNum = myTurn = usedWords = turnTime = null
-turnColorGreen = "#ac1"
+turnColorGreen = "#181"
 turnColorRed = "#d32"
 turnColorYellow = "#FFFFB6"
 turnColor = turnColorGreen
@@ -31,7 +31,8 @@ iceHTMLChar = (c) ->
 startTurn = (forced = false) ->
 	myTurn = true
 	$('#grid').removeClass('turnColorRed turnColorYellow').addClass('turnColorGreen')
-	$('#p1Score').removeClass('colorRed colorYellow').addClass('colorGreen')
+	$('#meScore').removeClass('colorRed colorYellow').addClass('colorGreen')
+	$('#opponentScore').removeClass('colorGreen colorYellow').addClass('colorRed')
 	if forced is false
 		showMessage 'firstTile'
 	else
@@ -41,7 +42,8 @@ endTurn = (forced = false) ->
 	selectedCoordinates = null
 	myTurn = false
 	$('#grid').removeClass('turnColorGreen turnColorYellow').addClass('turnColorRed')
-	$('#p2Score').removeClass('colorGreen colorYellow').addClass('colorRed')
+	$('#meScore').removeClass('colorGreen').addClass('colorRed')
+	$('#opponentScore').removeClass('colorRed').addClass('colorGreen')
 	if forced is false
 		showMessage 'waitForMove'
 	else
@@ -64,12 +66,12 @@ showMessage = (messageType) ->
 	switch messageType
 		when 'waitForConnection'
 			messageHtml = "Bíð eftir að mótspilara."
-			$('#usedwords, #grid, #scores').hide()
+			$('#usedwords, #grid, #scores #opponentScore #meScore').hide()
 		when 'waitForMove'
 			messageHtml = "Bíð eftir að mótspilarinn leiki."
 		when 'firstTile'
 			messageHtml = "Veldu fyrri stafinn."
-			effectColor = "#ac1"
+			effectColor = turnColorGreen
 		when 'secondTile'
 			messageHtml = "Veldu seinni stafinn."
 			effectColor = turnColorGreen
@@ -126,7 +128,7 @@ handleMessage = (message) ->
 			{players, currPlayerNum, tiles, yourNum: myNum, newWords, turnTime} = JSON.parse content
 			startGame players, currPlayerNum
 			# update page
-			$('#usedwords, #grid, #scores').show()
+			$('#usedwords, #grid, #scores #meScore #opponentScore').show()
 			$('#usedwords').html ""
 			usedWords = {}
 			updateUsedWords newWords
@@ -192,9 +194,10 @@ showThenFade = ($elem) ->
 	$elem.effect "highlight", color: "#eb4", 5500, -> $elem.remove()
 	
 startGame = (players, currPlayerNum) ->
-	for player in players
-		$("#p#{player.num}Name").html getPlayerName player
-		$("#p#{player.num}Score").html player.score
+	$("#meName").html getPlayerName players[myNum-1]
+	$("#meScore").html players[myNum-1].score
+	$("#opponentName").html getPlayerName players[2-myNum]
+	$("#opponentScore").html players[2-myNum].score
 	drawTiles()
 	if myNum is currPlayerNum
 		startTurn()
@@ -202,7 +205,10 @@ startGame = (players, currPlayerNum) ->
 		endTurn()
 
 showMoveResult = (player, swapCoordinates, moveScore, newWords) ->
-	$("#p#{player.num}Score").html player.score
+	if player.num is myNum
+		$("#meScore").html player.score
+	else
+		$("#opponentScore").html player.score
 	showNotice moveScore, newWords, player
 	swapTiles swapCoordinates
 	if player.num isnt myNum
@@ -210,6 +216,7 @@ showMoveResult = (player, swapCoordinates, moveScore, newWords) ->
 
 $(document).ready ->
 	$('#grid li').live 'click', tileClick
+	$
 	socket = io.connect()
 	socket.on 'connect', -> showMessage 'waitForConnection'
 	socket.on 'message', handleMessage
