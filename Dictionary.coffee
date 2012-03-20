@@ -1,5 +1,5 @@
 class Dictionary
-	@MIN_WORD_LENGTH: 2
+	@MIN_WORD_LENGTH: 3
 
 	constructor: (@originalWordList, grid) ->
 		@setGrid grid if grid?

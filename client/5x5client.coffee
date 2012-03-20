@@ -78,7 +78,7 @@ showMessage = (messageType) ->
 			messageHtml = "Veldu seinni stafinn"
 			effectColor = turnColorGreen
 		when 'timeIsUp'
-			messageHtml = "þú féllst á tíma"
+			messageHtml = "Þú féllst á tíma"
 			effectColor = turnColorRed
 		when 'yourTurnNow'
 			messageHtml = "Mótspilarinn féll á tíma"

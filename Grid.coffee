@@ -17,7 +17,7 @@ randomLetter = ->
 
 class Grid
 	constructor: ->
-		@size = size = 6
+		@size = size = 8
 		@tiles = for x in [0...size]
 			for y in [0...size]
 				randomLetter()

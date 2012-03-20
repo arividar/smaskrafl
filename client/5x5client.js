@@ -120,7 +120,7 @@
         effectColor = turnColorGreen;
         break;
       case 'timeIsUp':
-        messageHtml = "þú féllst á tíma";
+        messageHtml = "Þú féllst á tíma";
         effectColor = turnColorRed;
         break;
       case 'yourTurnNow':
