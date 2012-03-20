@@ -60,8 +60,8 @@
     if (forced == null) forced = false;
     myTurn = true;
     $('#grid').removeClass('turnColorRed turnColorYellow').addClass('turnColorGreen');
-    $('#meTimer').removeClass('colorRed colorYellow').addClass('colorGreen');
-    $('#opponentTimer').removeClass('colorGreen colorYellow').addClass('colorRed');
+    $('#opponentTimer').hide();
+    $('#meTimer').show();
     if (forced) {
       $("#opponentTimer").html("0");
       return showMessage('yourTurnNow');
@@ -75,8 +75,8 @@
     selectedCoordinates = null;
     myTurn = false;
     $('#grid').removeClass('turnColorGreen turnColorYellow').addClass('turnColorRed');
-    $('#meTimer').removeClass('colorGreen').addClass('colorRed');
-    $('#opponentTimer').removeClass('colorRed').addClass('colorGreen');
+    $('#meTimer').hide();
+    $('#opponentTimer').show();
     if (forced) {
       $('#meTimer').html("0");
       return showMessage('timeIsUp');
@@ -212,8 +212,8 @@
         tick = JSON.parse(content);
         if (tick === "tick") {
           $(turnTimer).html(turnTime);
-          $(turnTimer).removeClass('colorYellow colorRed').addClass('colorGreen');
-          return $(nonTurnTimer).removeClass('colorYellow colorGreen').addClass('colorRed');
+          $(nonTurnTimer).hide();
+          return $(turnTimer).show();
         } else {
           $(turnTimer).html(parseInt($(turnTimer).html()) - 1);
           if (parseInt($(turnTimer).html()) <= 5) {

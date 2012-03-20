@@ -31,8 +31,8 @@ iceHTMLChar = (c) ->
 startTurn = (forced = false) ->
 	myTurn = true
 	$('#grid').removeClass('turnColorRed turnColorYellow').addClass('turnColorGreen')
-	$('#meTimer').removeClass('colorRed colorYellow').addClass('colorGreen')
-	$('#opponentTimer').removeClass('colorGreen colorYellow').addClass('colorRed')
+	$('#opponentTimer').hide()
+	$('#meTimer').show()
 	if forced
 		$("#opponentTimer").html "0"
 		showMessage 'yourTurnNow'
@@ -43,8 +43,8 @@ endTurn = (forced = false) ->
 	selectedCoordinates = null
 	myTurn = false
 	$('#grid').removeClass('turnColorGreen turnColorYellow').addClass('turnColorRed')
-	$('#meTimer').removeClass('colorGreen').addClass('colorRed')
-	$('#opponentTimer').removeClass('colorRed').addClass('colorGreen')
+	$('#meTimer').hide()
+	$('#opponentTimer').show()
 	if forced
 		$('#meTimer').html "0"
 		showMessage 'timeIsUp'
@@ -155,8 +155,8 @@ handleMessage = (message) ->
 			# tick for first tick of turn, tock for others
 			if tick is "tick"
 				$(turnTimer).html turnTime
-				$(turnTimer).removeClass('colorYellow colorRed').addClass('colorGreen')
-				$(nonTurnTimer).removeClass('colorYellow colorGreen').addClass('colorRed')
+				$(nonTurnTimer).hide()
+				$(turnTimer).show()
 			else
 				$(turnTimer).html parseInt($(turnTimer).html()) - 1
 				if parseInt($(turnTimer).html()) <= 5
