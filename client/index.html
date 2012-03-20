@@ -8,37 +8,44 @@
 		<link rel="stylesheet" type="text/css" href="./style.css" /> 
 	</head>
 	<body>
-		<div id="message"></div>
 		<table id="gridtable" width="100%">
 			<tr>
-				<th id="meHeader"></th>
+				<th id="meHeader">
+					<div id="meName" class="scoreName"></div>
+			       	</th>
 				<th id="gridHeader" align="center">
-					<div id="timer"></div>
+					<div id="message"></div>
+			       	</th>
+				<th id="opponentHeader"> 
+					<div id="opponentName" class="scoreName"></div>
 				</th>
-				<th id="opponentHeader"></th>
 			</tr>
 			<tr>
 				<td width="40%" id="meInfo" align="center">
-					<div id="meName" class="scoreName"></div>
-					<div id="meScore" class="score"></div>
+					<div id="meScore" class="score">0</div>
 				</td>
-				<td width="20%">
+				<td width="20%" rowspan="2">
 					<div id="grid"></div>
 				</td>
 				<td width="40%" id="opponentInfo" align="center">
-					<div id="opponentName" class="scoreName"></div>
-					<div id="opponentScore" class="score"></div>
+					<div id="opponentScore" class="score">0</div>
 				</td>
 			</tr>
 			<tr>
-				<td>
+				<td width="40%" align="center">
+					<div id="meTimer" class="timer">0</div>
 				</td>
+				<td width="40%" align="center">
+					<div id="opponentTimer" class="timer">0</div>
+				</td>
+			</tr>
+			<tr>
+				<td></td>
 				<td>
 					<div id="utitle">Öll notuð orð</div>
 					<div id="usedwords"></div>
 				</td>
-				<td>
-				</td>
+				<td></td>
 			</tr>
 		</table>
 	</body>

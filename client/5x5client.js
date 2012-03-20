@@ -60,12 +60,13 @@
     if (forced == null) forced = false;
     myTurn = true;
     $('#grid').removeClass('turnColorRed turnColorYellow').addClass('turnColorGreen');
-    $('#meScore').removeClass('colorRed colorYellow').addClass('colorGreen');
-    $('#opponentScore').removeClass('colorGreen colorYellow').addClass('colorRed');
-    if (forced === false) {
-      return showMessage('firstTile');
-    } else {
+    $('#meTimer').removeClass('colorRed colorYellow').addClass('colorGreen');
+    $('#opponentTimer').removeClass('colorGreen colorYellow').addClass('colorRed');
+    if (forced) {
+      $("#opponentTimer").html("0");
       return showMessage('yourTurnNow');
+    } else {
+      return showMessage('firstTile');
     }
   };
 
@@ -74,12 +75,13 @@
     selectedCoordinates = null;
     myTurn = false;
     $('#grid').removeClass('turnColorGreen turnColorYellow').addClass('turnColorRed');
-    $('#meScore').removeClass('colorGreen').addClass('colorRed');
-    $('#opponentScore').removeClass('colorRed').addClass('colorGreen');
-    if (forced === false) {
-      return showMessage('waitForMove');
-    } else {
+    $('#meTimer').removeClass('colorGreen').addClass('colorRed');
+    $('#opponentTimer').removeClass('colorRed').addClass('colorGreen');
+    if (forced) {
+      $('#meTimer').html("0");
       return showMessage('timeIsUp');
+    } else {
+      return showMessage('waitForMove');
     }
   };
 
@@ -107,26 +109,26 @@
         $('#usedwords, #grid, #scores #opponentScore #meScore').hide();
         break;
       case 'waitForMove':
-        messageHtml = "Bíð eftir að mótspilarinn leiki.";
+        messageHtml = "Mótspilarinn á leik";
         break;
       case 'firstTile':
-        messageHtml = "Veldu fyrri stafinn.";
+        messageHtml = "Veldu fyrri stafinn";
         effectColor = turnColorGreen;
         break;
       case 'secondTile':
-        messageHtml = "Veldu seinni stafinn.";
+        messageHtml = "Veldu seinni stafinn";
         effectColor = turnColorGreen;
         break;
       case 'timeIsUp':
-        messageHtml = "þú féllst á tíma. Mótspilarinn á leik.";
+        messageHtml = "þú féllst á tíma";
         effectColor = turnColorRed;
         break;
       case 'yourTurnNow':
-        messageHtml = "Þú átt leik. Mótspilarinn féll á tíma.";
+        messageHtml = "Mótspilarinn féll á tíma";
         effectColor = turnColorGreen;
         break;
       case 'opponentQuit':
-        messageHtml = "Mótspilari þinn er hættur. Bíð eftur nýjum mótspilara.";
+        messageHtml = "Mótspilarinn hætti";
         $('#usedwords, #grid, #scores').hide();
     }
     $('#message').html(messageHtml);
@@ -179,7 +181,7 @@
   };
 
   handleMessage = function(message) {
-    var content, currPlayerNum, moveScore, newWords, player, players, swapCoordinates, tick, type, _ref, _ref2, _ref3;
+    var content, currPlayerNum, moveScore, newWords, nonTurnTimer, player, players, swapCoordinates, tick, turnTimer, type, _ref, _ref2, _ref3;
     _ref = typeAndContent(message), type = _ref.type, content = _ref.content;
     switch (type) {
       case 'welcome':
@@ -200,14 +202,23 @@
       case 'yourTurnNow':
         return startTurn(true);
       case 'tick':
+        if (myTurn) {
+          turnTimer = "#meTimer";
+          nonTurnTimer = "#opponentTimer";
+        } else {
+          turnTimer = "#opponentTimer";
+          nonTurnTimer = "#meTimer";
+        }
         tick = JSON.parse(content);
         if (tick === "tick") {
-          $('#timer').html(turnTime);
-          if (turnTime <= 5) {
-            return $('#grid').removeClass('turnColorRed turnColorGreen').addClass('turnColorYellow');
-          }
+          $(turnTimer).html(turnTime);
+          $(turnTimer).removeClass('colorYellow colorRed').addClass('colorGreen');
+          return $(nonTurnTimer).removeClass('colorYellow colorGreen').addClass('colorRed');
         } else {
-          return $('#timer').html(parseInt($('#timer').html()) - 1);
+          $(turnTimer).html(parseInt($(turnTimer).html()) - 1);
+          if (parseInt($(turnTimer).html()) <= 5) {
+            return $(turnTimer).removeClass('turnColorRed turnColorGreen').addClass('turnColorYellow');
+          }
         }
     }
   };

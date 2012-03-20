@@ -130,7 +130,9 @@ body {
 	padding: 5px 5px 0px 5px;
 	width: 90px;
 	height: 48px;
-	font-size: 38px;
+	font-size: 36px;
+	color: #FFF;
+	background: #333;
 }
 
 .notice, .error {
@@ -161,12 +163,10 @@ body {
 	padding: 12px;
 }
 
-#timer {
-	padding: 5px 5px 2px 5px;
-	width: 44px;
-	height: 44px;
-	font-size: 32px;
-	background: #444;
-	color: #fff;
+.timer {
+	padding: 5px;
+	width: 90px;
+	height: 48px;
+	font-size: 36px;
 	margin: 4px;
 }

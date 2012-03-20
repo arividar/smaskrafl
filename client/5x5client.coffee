@@ -31,23 +31,25 @@ iceHTMLChar = (c) ->
 startTurn = (forced = false) ->
 	myTurn = true
 	$('#grid').removeClass('turnColorRed turnColorYellow').addClass('turnColorGreen')
-	$('#meScore').removeClass('colorRed colorYellow').addClass('colorGreen')
-	$('#opponentScore').removeClass('colorGreen colorYellow').addClass('colorRed')
-	if forced is false
-		showMessage 'firstTile'
-	else
+	$('#meTimer').removeClass('colorRed colorYellow').addClass('colorGreen')
+	$('#opponentTimer').removeClass('colorGreen colorYellow').addClass('colorRed')
+	if forced
+		$("#opponentTimer").html "0"
 		showMessage 'yourTurnNow'
+	else
+		showMessage 'firstTile'
 
 endTurn = (forced = false) ->
 	selectedCoordinates = null
 	myTurn = false
 	$('#grid').removeClass('turnColorGreen turnColorYellow').addClass('turnColorRed')
-	$('#meScore').removeClass('colorGreen').addClass('colorRed')
-	$('#opponentScore').removeClass('colorRed').addClass('colorGreen')
-	if forced is false
-		showMessage 'waitForMove'
-	else
+	$('#meTimer').removeClass('colorGreen').addClass('colorRed')
+	$('#opponentTimer').removeClass('colorRed').addClass('colorGreen')
+	if forced
+		$('#meTimer').html "0"
 		showMessage 'timeIsUp'
+	else
+		showMessage 'waitForMove'
 
 drawTiles = (x1, y1, x2, y2) ->
 	gridHtml = ''
@@ -68,21 +70,21 @@ showMessage = (messageType) ->
 			messageHtml = "Bíð eftir að mótspilara."
 			$('#usedwords, #grid, #scores #opponentScore #meScore').hide()
 		when 'waitForMove'
-			messageHtml = "Bíð eftir að mótspilarinn leiki."
+			messageHtml = "Mótspilarinn á leik"
 		when 'firstTile'
-			messageHtml = "Veldu fyrri stafinn."
+			messageHtml = "Veldu fyrri stafinn"
 			effectColor = turnColorGreen
 		when 'secondTile'
-			messageHtml = "Veldu seinni stafinn."
+			messageHtml = "Veldu seinni stafinn"
 			effectColor = turnColorGreen
 		when 'timeIsUp'
-			messageHtml = "þú féllst á tíma. Mótspilarinn á leik."
+			messageHtml = "þú féllst á tíma"
 			effectColor = turnColorRed
 		when 'yourTurnNow'
-			messageHtml = "Þú átt leik. Mótspilarinn féll á tíma."
+			messageHtml = "Mótspilarinn féll á tíma"
 			effectColor = turnColorGreen
 		when 'opponentQuit'
-			messageHtml = "Mótspilari þinn er hættur. Bíð eftur nýjum mótspilara."
+			messageHtml = "Mótspilarinn hætti"
 			$('#usedwords, #grid, #scores').hide()
 	$('#message').html messageHtml
 	$('#message').effect("highlight", color: "#{effectColor}", 5500)
@@ -143,15 +145,22 @@ handleMessage = (message) ->
 		when 'yourTurnNow'
 			startTurn(true)
 		when 'tick'
+			if myTurn
+				turnTimer = "#meTimer"
+				nonTurnTimer = "#opponentTimer"
+			else
+				turnTimer = "#opponentTimer"
+				nonTurnTimer = "#meTimer"
 			tick = JSON.parse content
 			# tick for first tick of turn, tock for others
 			if tick is "tick"
-				$('#timer').html turnTime
-				if turnTime <= 5
-					$('#grid').removeClass('turnColorRed turnColorGreen')
-						.addClass('turnColorYellow')
+				$(turnTimer).html turnTime
+				$(turnTimer).removeClass('colorYellow colorRed').addClass('colorGreen')
+				$(nonTurnTimer).removeClass('colorYellow colorGreen').addClass('colorRed')
 			else
-				$('#timer').html parseInt($('#timer').html()) - 1
+				$(turnTimer).html parseInt($(turnTimer).html()) - 1
+				if parseInt($(turnTimer).html()) <= 5
+					$(turnTimer).removeClass('turnColorRed turnColorGreen').addClass('turnColorYellow')
 			
 typeAndContent = (message) ->
 	[ignore, type, content] = message.match /(.*?):(.*)/

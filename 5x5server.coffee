@@ -56,10 +56,12 @@ startTimer = (currPlayer, otherPlayer) ->
 	
 	# interval ticker for each second - fire before timer for safety's sake
 	game.interval = setInterval ->
-		idClientMap[currPlayer.id].send "tick:#{JSON.stringify('tock')}"
+			for player in game.players
+				idClientMap[player.id].send "tick:#{JSON.stringify('tock')}"
 	, 1000
 	# fire off first tick
-	idClientMap[currPlayer.id].send "tick:#{JSON.stringify('tick')}"
+	for player in game.players
+		idClientMap[player.id].send "tick:#{JSON.stringify('tick')}"
 
 	# timer for turn
 	game.timer = setTimeout ->
