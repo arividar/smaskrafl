@@ -67,7 +67,7 @@ showMessage = (messageType) ->
 	effectColor = "#FFF"
 	switch messageType
 		when 'waitForConnection'
-			messageHtml = "Bíð eftir að mótspilara."
+			messageHtml = "Bíð eftir mótspilara"
 			$('#usedwords, #grid, #scores #opponentScore #meScore').hide()
 		when 'waitForMove'
 			messageHtml = "Mótspilarinn á leik"
@@ -117,10 +117,17 @@ swapTiles = ({x1, y1, x2, y2}) ->
 updateUsedWords = (newWords) ->
 	# if no usedwords, initialize with new words
 	if Object.keys(usedWords).length is 0
-		[usedWords.wordsHtml, usedWords.defs] = [newWords.wordsHtml, newWords.defs]
+		newWordsHtmlSorted = newWords.wordsHtml.split(", ")
+					.sort((a, b) -> a.localeCompare b)
+					.join(", ")
+		[usedWords.wordsHtml, usedWords.defs] = [newWordsHtmlSorted, newWords.defs]
 	# otherwise only update usedWords if there are newWords formed during move
 	else if newWords.wordsHtml.length > 0
-		usedWords.wordsHtml = usedWords.wordsHtml.concat(", " + newWords.wordsHtml)
+		allUsedWords = usedWords.wordsHtml.concat(", " + newWords.wordsHtml)
+		usedWords.wordsHtml = allUsedWords.split(", ").sort().join(", ")
+		usedWords.wordsHtml = allUsedWords.split(", ")
+					.sort((a, b) -> a.localeCompare b)
+					.join(", ")
 	$('#usedwords').html usedWords.wordsHtml
 	
 handleMessage = (message) ->

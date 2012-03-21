@@ -27,8 +27,11 @@ class GameManager
 				
 	numberOfPlayers: (game) ->
 		count = 0
-		count++ for player in game.players when player.id isnt null
-		return count++
+		if game.players?
+			count++ for player in game.players when player.id isnt null
+			count++
+		else
+			count
 		
 	pruneEmptyGames: ->
 		for game in @games

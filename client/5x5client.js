@@ -105,7 +105,7 @@
     effectColor = "#FFF";
     switch (messageType) {
       case 'waitForConnection':
-        messageHtml = "Bíð eftir að mótspilara.";
+        messageHtml = "Bíð eftir mótspilara";
         $('#usedwords, #grid, #scores #opponentScore #meScore').hide();
         break;
       case 'waitForMove':
@@ -171,11 +171,18 @@
   };
 
   updateUsedWords = function(newWords) {
-    var _ref;
+    var allUsedWords, newWordsHtmlSorted, _ref;
     if (Object.keys(usedWords).length === 0) {
-      _ref = [newWords.wordsHtml, newWords.defs], usedWords.wordsHtml = _ref[0], usedWords.defs = _ref[1];
+      newWordsHtmlSorted = newWords.wordsHtml.split(", ").sort(function(a, b) {
+        return a.localeCompare(b);
+      }).join(", ");
+      _ref = [newWordsHtmlSorted, newWords.defs], usedWords.wordsHtml = _ref[0], usedWords.defs = _ref[1];
     } else if (newWords.wordsHtml.length > 0) {
-      usedWords.wordsHtml = usedWords.wordsHtml.concat(", " + newWords.wordsHtml);
+      allUsedWords = usedWords.wordsHtml.concat(", " + newWords.wordsHtml);
+      usedWords.wordsHtml = allUsedWords.split(", ").sort().join(", ");
+      usedWords.wordsHtml = allUsedWords.split(", ").sort(function(a, b) {
+        return a.localeCompare(b);
+      }).join(", ");
     }
     return $('#usedwords').html(usedWords.wordsHtml);
   };
