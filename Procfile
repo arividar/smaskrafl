@@ -1,1 +1,1 @@
-web: coffee 5x5server.coffee
+web: coffee ssserver.coffee
