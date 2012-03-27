@@ -20,11 +20,13 @@ class Game
 		player.score = 0 for player in @players
 		@dictionary.setGrid(@grid)
 
-	addPlayer: (sessionId) ->
+	addPlayer: (sessionId, username) ->
 		if !@player1.id
 			@player1.id = sessionId
+			@player1.name = username
 		else
 			@player2.id = sessionId
+			@player2.name = username
 			
 	removePlayer: (sessionId) ->
 		@playerWithId(sessionId).id = null

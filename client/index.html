@@ -1,52 +1,15 @@
 <html>
-	<head>
-		<title>S M Á S K R A F L</title>
-		<script type="text/javascript" src="jquery-1.7.1.min.js"></script>
-		<script type="text/javascript" src="jquery-ui-1.8.14.custom.min.js"></script>
-		<script type="text/javascript" src="/socket.io/socket.io.js"></script>
-		<script type="text/javascript" src="ssclient.js"></script>
-		<link rel="stylesheet" type="text/css" href="./style.css" /> 
-	</head>
-	<body>
-		<table id="gridtable" width="100%">
-			<tr>
-				<th id="meHeader">
-					<div id="meName" class="scoreName"></div>
-			       	</th>
-				<th id="gridHeader" align="center">
-					<div id="message"></div>
-			       	</th>
-				<th id="opponentHeader"> 
-					<div id="opponentName" class="scoreName"></div>
-				</th>
-			</tr>
-			<tr>
-				<td width="40%" id="meInfo" align="center">
-					<div id="meScore" class="score">0</div>
-				</td>
-				<td width="20%" rowspan="2">
-					<div id="grid"></div>
-				</td>
-				<td width="40%" id="opponentInfo" align="center">
-					<div id="opponentScore" class="score">0</div>
-				</td>
-			</tr>
-			<tr>
-				<td width="40%" align="center">
-					<div id="meTimer" class="timer colorGreen">0</div>
-				</td>
-				<td width="40%" align="center">
-					<div id="opponentTimer" class="timer colorRed">0</div>
-				</td>
-			</tr>
-			<tr>
-				<td></td>
-				<td>
-					<div id="utitle">Notuð orð</div>
-					<div id="usedwords"></div>
-				</td>
-				<td></td>
-			</tr>
-		</table>
-	</body>
+<head>
+<title>Skrafl</title>
+</script>	
+</head>
+<body>
+	<h1>Skrafl</h2>
+	<form action="/send" method="post" id="send">
+		<label for="userName">Hvað heitirðu?&nbsp;</label>
+		<input name="userName" size="30" id="userName" />
+		<input type="submit" />
+	</form>
+</body>
 </html>
+

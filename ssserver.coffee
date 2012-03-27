@@ -7,11 +7,20 @@ io = require('socket.io')
 
 app.use express.static(__dirname + '/client')
 app.use express.errorHandler { showStacktrace: true, dumpExceptions: true }
+app.use express.bodyParser()
 
 gameManager = new GameManager
 idClientMap = {}
 
 console.log 'CoffeeDir: ' + __dirname
+
+# simply return index.html
+app.get "/", (req, res) ->
+	res.sendfile "client/index.html"
+
+# process client message
+app.post "/send", (req, res) ->
+	res.redirect "/game.html\?player=#{req.body.userName}"
 
 port = process.env.PORT || 3000
 console.log 'Listening to port '+port
@@ -22,16 +31,18 @@ console.log "Browse to http://localhost:#{port} to play"
 socket = io.listen app
 
 socket.sockets.on 'connection', (client) ->
-	assignToGame client
-	client.on 'message', (message) ->
-		handleMessage client, message
-	client.on 'disconnect', ->
-		removeFromGame client
+	client.on 'login', (loginInfo) ->
+		console.log "************* login: #{loginInfo.playername}"
+		assignToGame client, loginInfo.playername
+		client.on 'message', (message) ->
+			handleMessage client, message
+		client.on 'disconnect', ->
+			removeFromGame client
 
-assignToGame = (client) ->
+assignToGame = (client, username) ->
 	idClientMap[client.id] = client
 	game = gameManager.getNextAvailableGame()
-	game.addPlayer client.id
+	game.addPlayer client.id, username
 	if game.isFull()
 		welcomePlayers(game)
 

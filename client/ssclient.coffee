@@ -27,6 +27,13 @@ iceHTMLChar = (c) ->
 		when 'ö' then '&#246;'
 		else c
 
+getUrlVars = ->
+  vars = {}
+  parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/g, (m, key, value) ->
+    vars[key] = value
+  )
+  vars
+
 # forced = true when last turn ended because a player took too long
 startTurn = (forced = false) ->
 	myTurn = true
@@ -173,13 +180,6 @@ typeAndContent = (message) ->
 	[ignore, type, content] = message.match /(.*?):(.*)/
 	{type, content}
 
-getPlayerName = (player) ->
-	name = null
-	if player.num is myNum
-		name = "Þú"
-	else
-		name = "Mótspilari"
-
 toArray = (newWords) ->
 	words = []
 	words.push key for key, value of newWords.defs
@@ -192,9 +192,9 @@ showNotice = (moveScore, newWords, player) ->
 		if player.num is myNum
 			$notice.html "Þú fannst engin ný orð í þetta sinn."
 		else
-			$notice.html "#{getPlayerName player} fann engin ný orð."
+			$notice.html "#{player.name} fann engin ný orð."
 	else
-		fannOrdTexti = "#{getPlayerName player} fann "
+		fannOrdTexti = "#{player.name} fann "
 		if player.num is myNum
 			fannOrdTexti = "Þú fannst "
 		$notice.html """ 
@@ -210,9 +210,9 @@ showThenFade = ($elem) ->
 	$elem.effect "highlight", color: "#eb4", 5500, -> $elem.remove()
 	
 startGame = (players, currPlayerNum) ->
-	$("#meName").html getPlayerName players[myNum-1]
+	$("#meName").html players[myNum-1].name
 	$("#meScore").html players[myNum-1].score
-	$("#opponentName").html getPlayerName players[2-myNum]
+	$("#opponentName").html players[2-myNum].name
 	$("#opponentScore").html players[2-myNum].score
 	drawTiles()
 	if myNum is currPlayerNum
@@ -232,7 +232,10 @@ showMoveResult = (player, swapCoordinates, moveScore, newWords) ->
 
 $(document).ready ->
 	$('#grid li').live 'click', tileClick
-	$
+	urlVars =getUrlVars()
 	socket = io.connect()
+	socket.emit 'login', { playername:urlVars["player"] }
+	console.log "************** emitted " + urlVars["player"]
+	console.log "************** emitted " + { playername:urlVars["player"] }
 	socket.on 'connect', -> showMessage 'waitForConnection'
 	socket.on 'message', handleMessage
