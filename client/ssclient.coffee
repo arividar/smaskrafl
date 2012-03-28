@@ -268,10 +268,10 @@ startGame = (players, currPlayerNum) ->
 		endTurn()
 
 showMoveResult = (player, swapCoordinates, moveScore, newWords) ->
-	moveString = "Engin orð: <b>0</b><br />"
+	moveString = "#{player.moveCount}: <b>0 stig</b><br/>"
 	words = toArray(newWords)
 	if words.length > 0
-		moveString = "#{words.join(', ')}: <b>#{moveScore}</b><br />"
+		moveString = "#{player.moveCount}: <b>#{moveScore} stig</b> - #{words.join(', ')}<br/>"
 	console.log "*************** movestring=" + moveString
 	if player.num is myNum
 		$("#meScore").html player.score
@@ -280,14 +280,14 @@ showMoveResult = (player, swapCoordinates, moveScore, newWords) ->
 		$("#opponentScore").html player.score
 		$("#opponentMoveList").prepend moveString
 	showNotice moveScore, newWords, player
-	swapTiles swapCoordinates
+	swapTiles swapCoordinates if swapCoordinates
 	if player.num isnt myNum
 		startTurn()
 
 $(document).ready ->
 	$('#grid li').live 'click', tileClick
 	urlVars = getUrlVars()
-	pname = Url.decode urlVars["player"] 
+	pname = Url.decode urlVars["player"]
 	socket = io.connect()
 	socket.emit 'login', { playername:pname }
 	console.log "************** emitted " + pname

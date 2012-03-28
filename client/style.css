@@ -18,6 +18,10 @@ h1 {
 
 body {
 	line-height: 1;
+	background-image: url("icesat.jpg");
+	background-position: 50% 50%;
+	background-size:100% 100%;
+	background-repeat: no-repeat;
 }
 
 ol, ul {
@@ -135,9 +139,11 @@ body {
 	position: relative;
 	text-align: left;
 	margin: 8px auto;
-	background: #ccc;
 	font-size: 16px;
 	padding: 12px;
+	border-width: medium; 
+	border-color: black;	
+	border-style: outset;
 }
 
 .score {
