@@ -5,6 +5,8 @@
 
 class Game
 	@TURN_TIME = 30000 #milliseconds
+	@MAX_MOVES = 15
+
 	constructor: ->
 		@grid = new Grid
 		@dictionary = new Dictionary(Words, @grid)
@@ -17,7 +19,9 @@ class Game
 
 	reset: ->
 		# reset scores and grid
-		player.score = 0 for player in @players
+		for player in @players
+			player.score = 0
+			player.moveCount = 0
 		@dictionary.setGrid(@grid)
 
 	addPlayer: (sessionId, username) ->
@@ -33,6 +37,9 @@ class Game
 		
 	isFull: ->
 		if @player1.id and @player2.id then true else false
+
+	isGameOver: ->
+		@player1.moveCount > @MAX_MOVES and @player2.moveCount > @MAX_MOVES
 
 	playerWithId: (sessionId) ->
 		if sessionId is @player1.id

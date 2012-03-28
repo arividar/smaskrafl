@@ -76,6 +76,7 @@ body {
 	border: 2px solid #555;
 	font-size: 48px;
 	font-family: Monaco, "DejaVu Sans Mono", "Lucida Console", monospace;
+	background: #ddd;
 }
 
 #grid.turnColorRed li:hover {
@@ -141,7 +142,8 @@ body {
 	margin: 8px auto;
 	font-size: 16px;
 	padding: 12px;
-	border-width: medium; 
+	background: #ddd;
+	border-width: thin; 
 	border-color: black;	
 	border-style: outset;
 }
@@ -180,9 +182,12 @@ body {
 	position: relative;
 	text-align: left;
 	margin: 8px auto;
-	background: #ccc;
+	background: #ddd;
 	font-size: 16px;
 	padding: 12px;
+	border-width: thin; 
+	border-color: black;	
+	border-style: outset;
 }
 
 .timer {

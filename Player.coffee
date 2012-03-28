@@ -32,7 +32,7 @@ class Player
 		result
 	
 	toJSON: ->
-		{@num, @name, @score}
+		{@num, @name, @score, @moveCount}
 	
 root = exports ? window
 root.Player = Player

@@ -82,18 +82,19 @@ getUrlVars = ->
   vars
 
 # forced = true when last turn ended because a player took too long
-startTurn = (forced = false) ->
+startTurn = (player, forced = false) ->
 	myTurn = true
 	$('#grid').removeClass('turnColorRed turnColorYellow').addClass('turnColorGreen')
 	$('#opponentTimer').hide()
 	$('#meTimer').show()
 	if forced
 		$("#opponentTimer").html "0"
+		showMoveResult player, null, 0, []
 		showMessage 'yourTurnNow'
 	else
 		showMessage 'firstTile'
 
-endTurn = (forced = false) ->
+endTurn = (player, forced = false) ->
 	selectedCoordinates = null
 	myTurn = false
 	$('#grid').removeClass('turnColorGreen turnColorYellow').addClass('turnColorRed')
@@ -101,6 +102,7 @@ endTurn = (forced = false) ->
 	$('#opponentTimer').show()
 	if forced
 		$('#meTimer').html "0"
+		showMoveResult player, null, 0, []
 		showMessage 'timeIsUp'
 	else
 		showMessage 'waitForMove'
@@ -140,6 +142,9 @@ showMessage = (messageType) ->
 		when 'opponentQuit'
 			messageHtml = "Mótspilarinn hætti"
 			$('#usedwords, #grid, #scores').hide()
+		when 'gameOver'
+			messageHtml = "LEIK LOKIÐ!"
+			$('#usedwords, #grid, #scores #opponentScore #meScore').hide()
 	$('#message').html messageHtml
 	$('#message').effect("highlight", color: "#{effectColor}", 5500)
 
@@ -153,7 +158,6 @@ tileClick = ->
 		showMessage 'firstTile'
 	else
 		[x, y] = @id.match(/(\d+)_(\d+)/)[1..]
-
 		if selectedCoordinates is null
 			selectedCoordinates = {x1: x, y1: y}
 			$this.addClass 'selected'
@@ -162,7 +166,7 @@ tileClick = ->
 			selectedCoordinates.x2 = x
 			selectedCoordinates.y2 = y
 			socket.send "move:#{JSON.stringify selectedCoordinates}"
-			endTurn()
+			endTurn(null, false)
 
 swapTiles = ({x1, y1, x2, y2}) ->
 	[tiles[x1][y1], tiles[x2][y2]] = [tiles[x2][y2], tiles[x1][y1]]
@@ -196,15 +200,18 @@ handleMessage = (message) ->
 			usedWords = {}
 			updateUsedWords newWords
 		when 'moveResult'
+			console.log('****got moveresult: '+content)
 			{player, swapCoordinates, moveScore, newWords} = JSON.parse content
 			showMoveResult player, swapCoordinates, moveScore, newWords
 			updateUsedWords newWords
 		when 'opponentQuit'
 			showMessage 'opponentQuit'
 		when 'timeIsUp'
-			endTurn(true)
+			player = JSON.parse content
+			endTurn(player, true)
 		when 'yourTurnNow'
-			startTurn(true)
+			player = JSON.parse content
+			startTurn(player, true)
 		when 'tick'
 			if myTurn
 				turnTimer = "#meTimer"
@@ -222,7 +229,11 @@ handleMessage = (message) ->
 				$(turnTimer).html parseInt($(turnTimer).html()) - 1
 				if parseInt($(turnTimer).html()) <= 5
 					$(turnTimer).removeClass('turnColorRed turnColorGreen').addClass('turnColorYellow')
-			
+		when 'gameOver'
+			{players, currPlayerNum, yourNum: myNum} = JSON.parse content
+			showMessage 'gameOver'
+
+
 typeAndContent = (message) ->
 	[ignore, type, content] = message.match /(.*?):(.*)/
 	{type, content}
@@ -263,16 +274,17 @@ startGame = (players, currPlayerNum) ->
 	$("#opponentScore").html players[2-myNum].score
 	drawTiles()
 	if myNum is currPlayerNum
-		startTurn()
+		startTurn(players[2-myNum], false)
 	else
-		endTurn()
+		endTurn(players[myNum-1], false)
 
 showMoveResult = (player, swapCoordinates, moveScore, newWords) ->
-	moveString = "#{player.moveCount}: <b>0 stig</b><br/>"
 	words = toArray(newWords)
+	moveString = "#{player.moveCount}: <b>0 stig</b><br/>"
 	if words.length > 0
-		moveString = "#{player.moveCount}: <b>#{moveScore} stig</b> - #{words.join(', ')}<br/>"
+		moveString = "#{player.moveCount}: #{words.join(', ')} = <b>#{moveScore} stig</b><br/>"
 	console.log "*************** movestring=" + moveString
+	console.log player
 	if player.num is myNum
 		$("#meScore").html player.score
 		$("#meMoveList").prepend moveString
@@ -282,7 +294,7 @@ showMoveResult = (player, swapCoordinates, moveScore, newWords) ->
 	showNotice moveScore, newWords, player
 	swapTiles swapCoordinates if swapCoordinates
 	if player.num isnt myNum
-		startTurn()
+		startTurn(player, false)
 
 $(document).ready ->
 	$('#grid li').live 'click', tileClick

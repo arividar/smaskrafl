@@ -76,12 +76,17 @@ startTimer = (currPlayer, otherPlayer) ->
 
 	# timer for turn
 	game.timer = setTimeout ->
-		idClientMap[currPlayer.id].send "timeIsUp: blank"
-		idClientMap[otherPlayer.id].send "yourTurnNow: blank"
-		game.endTurn()
-		resetTimer otherPlayer, currPlayer
-		# clearInterval game.interval
-		# startTimer otherPlayer, currPlayer	
+		currPlayer.moveCount++
+		if game.isGameOver
+			sendGameOver
+		else
+			resetTimer otherPlayer, currPlayer
+			idClientMap[currPlayer.id].send "timeIsUp: #{JSON.stringify(currPlayer)}"
+			idClientMap[otherPlayer.id].send "yourTurnNow: #{JSON.stringify(currPlayer)}"
+			game.endTurn()
+			resetTimer otherPlayer, currPlayer
+			# clearInterval game.interval
+			# startTimer otherPlayer, currPlayer	
 	, Game.TURN_TIME
 
 resetTimer = (currPlayer, otherPlayer) ->
@@ -90,6 +95,12 @@ resetTimer = (currPlayer, otherPlayer) ->
 	clearInterval game.interval
 	startTimer currPlayer, otherPlayer
 		
+sendGameOver = ->
+	info = {players: game.players, currPlayerNum: game.currPlayer.num}
+	for player in game.players
+		playerInfo = extend {}, info, {yourNum: player.num}
+		idClientMap[player.id].send "gameOver:#{JSON.stringify playerInfo}"
+
 welcomePlayers = (game) ->
 	info = {players: game.players, tiles: game.grid.tiles
 				 , currPlayerNum: game.currPlayer.num
@@ -97,9 +108,6 @@ welcomePlayers = (game) ->
 	for player in game.players
 		playerInfo = extend {}, info, {yourNum: player.num}
 		idClientMap[player.id].send "welcome:#{JSON.stringify playerInfo}"
-		console.log "***************** WELCOME PLAYER: #{player.id}"
- 
-	
 	# reset things just to be safe - could be an old game getting recycled
 	resetTimer game.currPlayer, game.otherPlayer
 	
@@ -108,15 +116,19 @@ handleMessage = (client, message) ->
 	game = gameManager.getGameWithPlayer client
 	if type is 'move'
 		return unless client.id is game.currPlayer.id #no cheating
-		swapCoordinates = JSON.parse content
-		{moveScore, newWords} = game.currPlayer.makeMove swapCoordinates
-		result = {swapCoordinates, moveScore, player: game.currPlayer, newWords: getWords(newWords)}
-						
-		# only send results to players, reset timer since move has been made
-		for player in game.players
-			idClientMap[player.id].send "moveResult:#{JSON.stringify result}"
-		game.endTurn()
-		resetTimer game.currPlayer, game.otherPlayer
+		if false #game.isGameOver
+			console.log("******send game over")
+			sendGameOver
+		else
+			swapCoordinates = JSON.parse content
+			{moveScore, newWords} = game.currPlayer.makeMove swapCoordinates
+			result = {swapCoordinates, moveScore, player: game.currPlayer, newWords: getWords(newWords)}
+			# only send results to players, reset timer since move has been made
+			for player in game.players
+				idClientMap[player.id].send "moveResult:#{JSON.stringify result}"
+				console.log("*******moveresult: "+JSON.stringify(result))
+			game.endTurn()
+			resetTimer game.currPlayer, game.otherPlayer
 
 getWords = (newWords) ->
   # gather used words	and defs - only send new ones
