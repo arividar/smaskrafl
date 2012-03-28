@@ -4,6 +4,53 @@ turnColorRed = "#d32"
 turnColorYellow = "#FFFFB6"
 turnColor = turnColorGreen
 
+Url =
+  encode: (string) ->
+    escape @_utf8_encode(string)
+
+  decode: (string) ->
+    @_utf8_decode unescape(string)
+
+  _utf8_encode: (string) ->
+    string = string.replace(/\r\n/g, "\n")
+    utftext = ""
+    n = 0
+
+    while n < string.length
+      c = string.charCodeAt(n)
+      if c < 128
+        utftext += String.fromCharCode(c)
+      else if (c > 127) and (c < 2048)
+        utftext += String.fromCharCode((c >> 6) | 192)
+        utftext += String.fromCharCode((c & 63) | 128)
+      else
+        utftext += String.fromCharCode((c >> 12) | 224)
+        utftext += String.fromCharCode(((c >> 6) & 63) | 128)
+        utftext += String.fromCharCode((c & 63) | 128)
+      n++
+    utftext
+
+  _utf8_decode: (utftext) ->
+    string = ""
+    i = 0
+    c = c1 = c2 = 0
+    while i < utftext.length
+      c = utftext.charCodeAt(i)
+      if c < 128
+        string += String.fromCharCode(c)
+        i++
+      else if (c > 191) and (c < 224)
+        c2 = utftext.charCodeAt(i + 1)
+        string += String.fromCharCode(((c & 31) << 6) | (c2 & 63))
+        i += 2
+      else
+        c2 = utftext.charCodeAt(i + 1)
+        c3 = utftext.charCodeAt(i + 2)
+        string += String.fromCharCode(((c & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63))
+        i += 3
+    string
+
+
 iceHTMLChar = (c) ->
 	switch c
 		when 'Á' then '&Aacute;'
@@ -68,7 +115,7 @@ drawTiles = (x1, y1, x2, y2) ->
 	# draw the grid and highlight the recently swapped tiles
 	$('#grid').html(gridHtml)
 		.find("li#tile#{x1}_#{y1}").add("li#tile#{x2}_#{y2}")
-		.effect("highlight", color: turnColor, 5500)
+		.effect("highlight", color: turnColor, 3000)
 		
 showMessage = (messageType) ->
 	effectColor = "#FFF"
@@ -190,25 +237,25 @@ showNotice = (moveScore, newWords, player) ->
 	$notice = $("<p class='notice'></p>")
 	if moveScore is 0
 		if player.num is myNum
-			$notice.html "Þú fannst engin ný orð í þetta sinn."
+			$notice.html "Þú fannst engin ný orð"
 		else
-			$notice.html "#{player.name} fann engin ný orð."
+			$notice.html "#{player.name} fann engin ný orð"
 	else
 		fannOrdTexti = "#{player.name} fann "
+		messageLocation = '#opponentMoveList'
 		if player.num is myNum
 			fannOrdTexti = "Þú fannst "
+			messageLocation = '#meMoveList'
 		$notice.html """ 
 			#{fannOrdTexti} #{words.length} orð:<br /> 
 			<b>#{words.join(', ')}</b><br /> 
 			sem gefur <b>#{moveScore / words.length}x#{words.length}
 			= #{moveScore}</b> stig!
 		"""
-	showThenFade $notice
+		$notice.insertAfter $(messageLocation)
+		$notice.effect "highlight", color: "#eb4", 7500, -> $notice.remove()
 
-showThenFade = ($elem) ->
-	$elem.insertAfter $('#grid')
-	$elem.effect "highlight", color: "#eb4", 5500, -> $elem.remove()
-	
+
 startGame = (players, currPlayerNum) ->
 	$("#meName").html players[myNum-1].name
 	$("#meScore").html players[myNum-1].score
@@ -221,10 +268,17 @@ startGame = (players, currPlayerNum) ->
 		endTurn()
 
 showMoveResult = (player, swapCoordinates, moveScore, newWords) ->
+	moveString = "Engin orð: <b>0</b><br />"
+	words = toArray(newWords)
+	if words.length > 0
+		moveString = "#{words.join(', ')}: <b>#{moveScore}</b><br />"
+	console.log "*************** movestring=" + moveString
 	if player.num is myNum
 		$("#meScore").html player.score
+		$("#meMoveList").prepend moveString
 	else
 		$("#opponentScore").html player.score
+		$("#opponentMoveList").prepend moveString
 	showNotice moveScore, newWords, player
 	swapTiles swapCoordinates
 	if player.num isnt myNum
@@ -232,10 +286,11 @@ showMoveResult = (player, swapCoordinates, moveScore, newWords) ->
 
 $(document).ready ->
 	$('#grid li').live 'click', tileClick
-	urlVars =getUrlVars()
+	urlVars = getUrlVars()
+	pname = Url.decode urlVars["player"] 
 	socket = io.connect()
-	socket.emit 'login', { playername:urlVars["player"] }
-	console.log "************** emitted " + urlVars["player"]
-	console.log "************** emitted " + { playername:urlVars["player"] }
+	socket.emit 'login', { playername:pname }
+	console.log "************** emitted " + pname
+	console.log "************** emitted " + { playername:pname }
 	socket.on 'connect', -> showMessage 'waitForConnection'
 	socket.on 'message', handleMessage
