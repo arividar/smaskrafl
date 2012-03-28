@@ -12,6 +12,10 @@ fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td {
 	background: transparent;
 }
 
+h1 {
+	font-size:200%;
+}
+
 body {
 	line-height: 1;
 }
