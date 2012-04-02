@@ -5,7 +5,7 @@
 
 class Game
 	@TURN_TIME = 30000 #milliseconds
-	@MAX_MOVES = 15
+	@MAX_MOVES = 10
 
 	constructor: ->
 		@grid = new Grid
@@ -36,10 +36,30 @@ class Game
 		@playerWithId(sessionId).id = null
 		
 	isFull: ->
-		if @player1.id and @player2.id then true else false
+		if @player1.id and @player2.id
+			true
+		else
+			false
 
 	isGameOver: ->
-		@player1.moveCount > @MAX_MOVES and @player2.moveCount > @MAX_MOVES
+		console.log "***** IN isGameOver: #{(@player1.moveCount >= Game.MAX_MOVES) and (@player2.moveCount >= Game.MAX_MOVES)}"
+		console.log "***** @player1.moveCount: #{@player1.moveCount}"
+		console.log "***** Game.MAX_MOVES:#{Game.MAX_MOVES}"
+		console.log "***** >=:#{(@player1.moveCount >= Game.MAX_MOVES)}"
+		if (@player1.moveCount >= Game.MAX_MOVES) and (@player2.moveCount >= Game.MAX_MOVES)
+			true
+		else
+			false
+	
+	winner: ->
+		if not @isGameOver()
+			null
+		else if @player1.score > @player2.score
+			@player1
+		else if @player1.score < @player2.score
+			@player2
+		else
+			null
 
 	playerWithId: (sessionId) ->
 		if sessionId is @player1.id

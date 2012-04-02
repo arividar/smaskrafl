@@ -17,7 +17,7 @@ class GameManager
 		# otherwise check if we are re-using old game and reset if necessary
 		else if @games[@games.length - 1].wasPlayed is true
 			@games[@games.length - 1].reset()
-		console.log "************************* Find next available game: #{@games.length}"
+		console.log "***********Find next available game: #{@games.length}"
 		@games[@games.length - 1]
 		
 	getGameWithPlayer: (client) ->

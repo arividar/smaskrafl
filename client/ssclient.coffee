@@ -143,6 +143,7 @@ showMessage = (messageType) ->
 			messageHtml = "Mótspilarinn hætti"
 			$('#usedwords, #grid, #scores').hide()
 		when 'gameOver'
+			console.log "******* got GAME OVER!"
 			messageHtml = "LEIK LOKIÐ!"
 			$('#usedwords, #grid, #scores #opponentScore #meScore').hide()
 	$('#message').html messageHtml
@@ -230,7 +231,7 @@ handleMessage = (message) ->
 				if parseInt($(turnTimer).html()) <= 5
 					$(turnTimer).removeClass('turnColorRed turnColorGreen').addClass('turnColorYellow')
 		when 'gameOver'
-			{players, currPlayerNum, yourNum: myNum} = JSON.parse content
+			{winner, currPlayerNum, yourNum: myNum} = JSON.parse content
 			showMessage 'gameOver'
 
 

@@ -51,13 +51,11 @@ removeFromGame = (client) ->
 	#remove player from game
 	game = gameManager.getGameWithPlayer client
 	game.removePlayer client.id
-
 	# remove timer and interval when player disconects and notify remaining player
 	clearTimeout game.timer
 	clearInterval game.interval
 	for player in game.players
 		idClientMap[player.id].send "opponentQuit: blank" if player.id
-
 	# two players in games where opponent quit can be connected automatically
 	gameManager.connectOrphanedPlayers(welcomePlayers)
 
@@ -67,6 +65,14 @@ startTimer = (currPlayer, otherPlayer) ->
 	
 	# interval ticker for each second - fire before timer for safety's sake
 	game.interval = setInterval ->
+		if game.isGameOver()
+			console.log "***** is Game over in a tick"
+			console.log "***** isGameOver: #{JSON.stringify(game.isGameOver())}"
+			console.log "***** isFull: #{JSON.stringify(game.isFull())}"
+			console.log "***** p1: #{JSON.stringify(game.player1)}"
+			console.log "***** p2: #{JSON.stringify(game.player2)}"
+			sendGameOver game
+		else
 			for player in game.players
 				idClientMap[player.id].send "tick:#{JSON.stringify('tock')}"
 	, 1000
@@ -77,7 +83,8 @@ startTimer = (currPlayer, otherPlayer) ->
 	# timer for turn
 	game.timer = setTimeout ->
 		currPlayer.moveCount++
-		if game.isGameOver
+		if game.isGameOver()
+			console.log "***** is Game over setTimeout:" + game.isGameOver()
 			sendGameOver
 		else
 			resetTimer otherPlayer, currPlayer
@@ -85,8 +92,6 @@ startTimer = (currPlayer, otherPlayer) ->
 			idClientMap[otherPlayer.id].send "yourTurnNow: #{JSON.stringify(currPlayer)}"
 			game.endTurn()
 			resetTimer otherPlayer, currPlayer
-			# clearInterval game.interval
-			# startTimer otherPlayer, currPlayer	
 	, Game.TURN_TIME
 
 resetTimer = (currPlayer, otherPlayer) ->
@@ -95,11 +100,12 @@ resetTimer = (currPlayer, otherPlayer) ->
 	clearInterval game.interval
 	startTimer currPlayer, otherPlayer
 		
-sendGameOver = ->
-	info = {players: game.players, currPlayerNum: game.currPlayer.num}
-	for player in game.players
+sendGameOver = (theGame) ->
+	console.log "******** sending Game over!!!!"
+	info = {winner: theGame.winner, currPlayerNum: theGame.currPlayer.num}
+	for player in theGame.players
 		playerInfo = extend {}, info, {yourNum: player.num}
-		idClientMap[player.id].send "gameOver:#{JSON.stringify playerInfo}"
+		idClientMap[player.id].send "gameOver: #{JSON.stringify playerInfo}"
 
 welcomePlayers = (game) ->
 	info = {players: game.players, tiles: game.grid.tiles
@@ -116,7 +122,7 @@ handleMessage = (client, message) ->
 	game = gameManager.getGameWithPlayer client
 	if type is 'move'
 		return unless client.id is game.currPlayer.id #no cheating
-		if false #game.isGameOver
+		if game.isGameOver()
 			console.log("******send game over")
 			sendGameOver
 		else
