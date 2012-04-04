@@ -4,8 +4,8 @@
 {Words} = require './nonfetlc.js'
 
 class Game
-	@TURN_TIME = 30000 #milliseconds
-	@MAX_MOVES = 10
+	@TURN_TIME = 30000 # milliseconds
+	@MAX_MOVES = 5
 
 	constructor: ->
 		@grid = new Grid
@@ -42,16 +42,12 @@ class Game
 			false
 
 	isGameOver: ->
-		console.log "   ***** IN isGameOver: #{(@player1.moveCount >= Game.MAX_MOVES) and (@player2.moveCount >= Game.MAX_MOVES)}"
-		console.log "   ***** @player1.moveCount: #{@player1.moveCount}"
-		console.log "   ***** @player2.moveCount: #{@player2.moveCount}"
-		console.log "   ***** Game.MAX_MOVES:#{Game.MAX_MOVES}"
-		console.log "   ***** >=:#{(@player1.moveCount >= Game.MAX_MOVES)}"
 		if (@player1.moveCount >= Game.MAX_MOVES) and (@player2.moveCount >= Game.MAX_MOVES)
 			true
 		else
 			false
 	
+	# Returns the winner of the game. Null if there is no winner.
 	winner: ->
 		if not @isGameOver()
 			null

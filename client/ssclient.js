@@ -1,5 +1,5 @@
 (function() {
-  var Url, drawTiles, endTurn, getUrlVars, handleMessage, iceHTMLChar, myNum, myTurn, selectedCoordinates, showMessage, showMoveResult, showNotice, socket, startGame, startTurn, swapTiles, tileClick, tiles, toArray, turnColor, turnColorGreen, turnColorRed, turnColorYellow, turnTime, typeAndContent, updateUsedWords, usedWords;
+  var Url, drawTiles, endGame, endTurn, getUrlVars, handleMessage, iceHTMLChar, myNum, myTurn, selectedCoordinates, showMessage, showMoveResult, showNotice, socket, startGame, startTurn, swapTiles, tileClick, tiles, toArray, turnColor, turnColorGreen, turnColorRed, turnColorYellow, turnTime, typeAndContent, updateUsedWords, usedWords;
 
   socket = tiles = selectedCoordinates = myNum = myTurn = usedWords = turnTime = null;
 
@@ -170,7 +170,7 @@
     switch (messageType) {
       case 'waitForConnection':
         messageHtml = "Bíð eftir mótspilara";
-        $('#usedwords, #grid, #scores #opponentScore #meScore').hide();
+        $('#usedwords, #grid, #opponentScore, #meScore').hide();
         break;
       case 'waitForMove':
         messageHtml = "Mótspilarinn á leik";
@@ -193,12 +193,12 @@
         break;
       case 'opponentQuit':
         messageHtml = "Mótspilarinn hætti";
-        $('#usedwords, #grid, #scores').hide();
+        $('#usedwords, #grid').hide();
         break;
       case 'gameOver':
         console.log("******* got GAME OVER!");
         messageHtml = "LEIK LOKIÐ!";
-        $('#usedwords, #grid, #scores #opponentScore #meScore').hide();
+        $('#usedwords, #meTimer, #opponentTimer').hide();
     }
     $('#message').html(messageHtml);
     return $('#message').effect("highlight", {
@@ -263,7 +263,7 @@
       case 'welcome':
         _ref2 = JSON.parse(content), players = _ref2.players, currPlayerNum = _ref2.currPlayerNum, tiles = _ref2.tiles, myNum = _ref2.yourNum, newWords = _ref2.newWords, turnTime = _ref2.turnTime;
         startGame(players, currPlayerNum);
-        $('#usedwords, #grid, #scores #meScore #opponentScore').show();
+        $('#usedwords, #grid, #meScore, #opponentScore').show();
         $('#usedwords').html("");
         usedWords = {};
         return updateUsedWords(newWords);
@@ -301,8 +301,8 @@
         }
         break;
       case 'gameOver':
-        _ref4 = JSON.parse(content), winner = _ref4.winner, currPlayerNum = _ref4.currPlayerNum, myNum = _ref4.yourNum;
-        return showMessage('gameOver');
+        _ref4 = JSON.parse(content), winner = _ref4.winner, myNum = _ref4.yourNum;
+        return endGame(winner);
     }
   };
 
@@ -366,12 +366,17 @@
     }
   };
 
+  endGame = function(winner) {
+    $("#grid").html("<p></p>\n<h2>L E I K   L O K I Ð</h2>\n<h2>Einhver vann!</h2>\n<h3><p>\n<FORM>\n<INPUT type=\"button\" value=\"Nýr leikur\" onClick=\"history.go(-1);return true;\">\n</FORM>\n</p></h3>");
+    return showMessage('gameOver');
+  };
+
   showMoveResult = function(player, swapCoordinates, moveScore, newWords) {
     var moveString, words;
     words = toArray(newWords);
-    moveString = "<b>" + player.moveCount + ": 0 stig</b><br/>";
+    moveString = "<b>" + player.moveCount + ": 0</b><br/>";
     if (words.length > 0) {
-      moveString = "<b>" + player.moveCount + ": " + moveScore + " stig</b><br/>&nbsp;&nbsp;&nbsp;" + (words.join(', ')) + "<br/>";
+      moveString = "<b>" + player.moveCount + ": " + moveScore + "</b> - " + (words.join(', ')) + "<br/>";
     }
     console.log("*************** movestring=" + moveString);
     console.log(player);

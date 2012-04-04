@@ -71,6 +71,7 @@ body {
 #grid {
 	position: relative;
 	text-align: center;
+	width: 620px;
 	margin: 0px 0px;
 	padding: 12px 0px;
 	border: 2px solid #555;
@@ -136,7 +137,7 @@ body {
 }
 
 .moveList {
-	width: 60%;
+	width: 80%;
 	position: relative;
 	text-align: left;
 	margin: 8px auto;

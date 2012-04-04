@@ -124,7 +124,7 @@ showMessage = (messageType) ->
 	switch messageType
 		when 'waitForConnection'
 			messageHtml = "Bíð eftir mótspilara"
-			$('#usedwords, #grid, #scores #opponentScore #meScore').hide()
+			$('#usedwords, #grid, #opponentScore, #meScore').hide()
 		when 'waitForMove'
 			messageHtml = "Mótspilarinn á leik"
 		when 'firstTile'
@@ -141,11 +141,11 @@ showMessage = (messageType) ->
 			effectColor = turnColorGreen
 		when 'opponentQuit'
 			messageHtml = "Mótspilarinn hætti"
-			$('#usedwords, #grid, #scores').hide()
+			$('#usedwords, #grid').hide()
 		when 'gameOver'
 			console.log "******* got GAME OVER!"
 			messageHtml = "LEIK LOKIÐ!"
-			$('#usedwords, #grid, #scores #opponentScore #meScore').hide()
+			$('#usedwords, #meTimer, #opponentTimer').hide()
 	$('#message').html messageHtml
 	$('#message').effect("highlight", color: "#{effectColor}", 5500)
 
@@ -196,7 +196,7 @@ handleMessage = (message) ->
 			{players, currPlayerNum, tiles, yourNum: myNum, newWords, turnTime} = JSON.parse content
 			startGame players, currPlayerNum
 			# update page
-			$('#usedwords, #grid, #scores #meScore #opponentScore').show()
+			$('#usedwords, #grid, #meScore, #opponentScore').show()
 			$('#usedwords').html ""
 			usedWords = {}
 			updateUsedWords newWords
@@ -230,10 +230,10 @@ handleMessage = (message) ->
 				$(turnTimer).html parseInt($(turnTimer).html()) - 1
 				if parseInt($(turnTimer).html()) <= 5
 					$(turnTimer).removeClass('turnColorRed turnColorGreen').addClass('turnColorYellow')
-		when 'gameOver'
-			{winner, currPlayerNum, yourNum: myNum} = JSON.parse content
-			showMessage 'gameOver'
 
+		when 'gameOver'
+			{winner, yourNum:myNum} = JSON.parse content
+			endGame(winner)
 
 typeAndContent = (message) ->
 	[ignore, type, content] = message.match /(.*?):(.*)/
@@ -267,7 +267,6 @@ showNotice = (moveScore, newWords, player) ->
 		$notice.insertAfter $(messageLocation)
 		$notice.effect "highlight", color: "#eb4", 7500, -> $notice.remove()
 
-
 startGame = (players, currPlayerNum) ->
 	$("#meName").html players[myNum-1].name
 	$("#meScore").html players[myNum-1].score
@@ -279,11 +278,24 @@ startGame = (players, currPlayerNum) ->
 	else
 		endTurn(players[myNum-1], false)
 
+endGame = (winner) ->
+	$("#grid").html """
+		<p></p>
+		<h2>L E I K   L O K I Ð</h2>
+		<h2>Einhver vann!</h2>
+		<h3><p>
+		<FORM>
+		<INPUT type="button" value="Nýr leikur" onClick="history.go(-1);return true;">
+		</FORM>
+		</p></h3>
+	"""
+	showMessage 'gameOver'
+
 showMoveResult = (player, swapCoordinates, moveScore, newWords) ->
 	words = toArray(newWords)
-	moveString = "<b>#{player.moveCount}: 0 stig</b><br/>"
+	moveString = "<b>#{player.moveCount}: 0</b><br/>"
 	if words.length > 0
-		moveString = "<b>#{player.moveCount}: #{moveScore} stig</b><br/>&nbsp;&nbsp;&nbsp;#{words.join(', ')}<br/>"
+		moveString = "<b>#{player.moveCount}: #{moveScore}</b> - #{words.join(', ')}<br/>"
 	console.log "*************** movestring=" + moveString
 	console.log player
 	if player.num is myNum
