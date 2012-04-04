@@ -281,9 +281,9 @@ startGame = (players, currPlayerNum) ->
 
 showMoveResult = (player, swapCoordinates, moveScore, newWords) ->
 	words = toArray(newWords)
-	moveString = "#{player.moveCount}: <b>0 stig</b><br/>"
+	moveString = "<b>#{player.moveCount}: 0 stig</b><br/>"
 	if words.length > 0
-		moveString = "#{player.moveCount}: #{words.join(', ')} = <b>#{moveScore} stig</b><br/>"
+		moveString = "<b>#{player.moveCount}: #{moveScore} stig</b><br/>&nbsp;&nbsp;&nbsp;#{words.join(', ')}<br/>"
 	console.log "*************** movestring=" + moveString
 	console.log player
 	if player.num is myNum
