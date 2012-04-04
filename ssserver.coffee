@@ -65,12 +65,9 @@ startTimer = (currPlayer, otherPlayer) ->
 	
 	# interval ticker for each second - fire before timer for safety's sake
 	game.interval = setInterval ->
+		console.log "***** in setInterval Parameter for interval ticker"
 		if game.isGameOver()
-			console.log "***** is Game over in a tick"
-			console.log "***** isGameOver: #{JSON.stringify(game.isGameOver())}"
-			console.log "***** isFull: #{JSON.stringify(game.isFull())}"
-			console.log "***** p1: #{JSON.stringify(game.player1)}"
-			console.log "***** p2: #{JSON.stringify(game.player2)}"
+			console.log "***** Game is over in a tick"
 			sendGameOver game
 		else
 			for player in game.players
@@ -82,9 +79,10 @@ startTimer = (currPlayer, otherPlayer) ->
 
 	# timer for turn
 	game.timer = setTimeout ->
+		console.log "***** in setTimeout parameter function"
 		currPlayer.moveCount++
 		if game.isGameOver()
-			console.log "***** is Game over setTimeout:" + game.isGameOver()
+			console.log "***** Game is over in setTimeout"
 			sendGameOver
 		else
 			resetTimer otherPlayer, currPlayer
@@ -122,6 +120,7 @@ handleMessage = (client, message) ->
 	game = gameManager.getGameWithPlayer client
 	if type is 'move'
 		return unless client.id is game.currPlayer.id #no cheating
+		console.log("****** in handle move message - isGameOver")
 		if game.isGameOver()
 			console.log("******send game over")
 			sendGameOver

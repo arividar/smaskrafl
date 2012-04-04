@@ -42,10 +42,11 @@ class Game
 			false
 
 	isGameOver: ->
-		console.log "***** IN isGameOver: #{(@player1.moveCount >= Game.MAX_MOVES) and (@player2.moveCount >= Game.MAX_MOVES)}"
-		console.log "***** @player1.moveCount: #{@player1.moveCount}"
-		console.log "***** Game.MAX_MOVES:#{Game.MAX_MOVES}"
-		console.log "***** >=:#{(@player1.moveCount >= Game.MAX_MOVES)}"
+		console.log "   ***** IN isGameOver: #{(@player1.moveCount >= Game.MAX_MOVES) and (@player2.moveCount >= Game.MAX_MOVES)}"
+		console.log "   ***** @player1.moveCount: #{@player1.moveCount}"
+		console.log "   ***** @player2.moveCount: #{@player2.moveCount}"
+		console.log "   ***** Game.MAX_MOVES:#{Game.MAX_MOVES}"
+		console.log "   ***** >=:#{(@player1.moveCount >= Game.MAX_MOVES)}"
 		if (@player1.moveCount >= Game.MAX_MOVES) and (@player2.moveCount >= Game.MAX_MOVES)
 			true
 		else
