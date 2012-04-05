@@ -143,8 +143,7 @@ showMessage = (messageType) ->
 			messageHtml = "Mótspilarinn hætti"
 			$('#usedwords, #grid').hide()
 		when 'gameOver'
-			console.log "******* got GAME OVER!"
-			messageHtml = "LEIK LOKIÐ!"
+			messageHtml = ""
 			$('#usedwords, #meTimer, #opponentTimer').hide()
 	$('#message').html messageHtml
 	$('#message').effect("highlight", color: "#{effectColor}", 5500)
@@ -280,14 +279,19 @@ startGame = (players, currPlayerNum) ->
 
 endGame = (winner) ->
 	$("#grid").html """
-		<p></p>
-		<h2>L E I K   L O K I Ð</h2>
-		<h2>Einhver vann!</h2>
-		<h3><p>
+		<center>
+		<p>&nbsp;</p>
+		<p>&nbsp;</p>
+		Leik lokið!
+		<p>&nbsp;</p>
+		<p>&nbsp;</p>
+		#{winner.name} vann!
+		<p>&nbsp;</p>
+		<p>&nbsp;</p>
 		<FORM>
 		<INPUT type="button" value="Nýr leikur" onClick="history.go(-1);return true;">
 		</FORM>
-		</p></h3>
+		</center>
 	"""
 	showMessage 'gameOver'
 

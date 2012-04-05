@@ -196,8 +196,7 @@
         $('#usedwords, #grid').hide();
         break;
       case 'gameOver':
-        console.log("******* got GAME OVER!");
-        messageHtml = "LEIK LOKIÐ!";
+        messageHtml = "";
         $('#usedwords, #meTimer, #opponentTimer').hide();
     }
     $('#message').html(messageHtml);
@@ -367,7 +366,7 @@
   };
 
   endGame = function(winner) {
-    $("#grid").html("<p></p>\n<h2>L E I K   L O K I Ð</h2>\n<h2>Einhver vann!</h2>\n<h3><p>\n<FORM>\n<INPUT type=\"button\" value=\"Nýr leikur\" onClick=\"history.go(-1);return true;\">\n</FORM>\n</p></h3>");
+    $("#grid").html("<center>\n<p>&nbsp;</p>\n<p>&nbsp;</p>\nLeik lokið!\n<p>&nbsp;</p>\n<p>&nbsp;</p>\n" + winner.name + " vann!\n<p>&nbsp;</p>\n<p>&nbsp;</p>\n<FORM>\n<INPUT type=\"button\" value=\"Nýr leikur\" onClick=\"history.go(-1);return true;\">\n</FORM>\n</center>");
     return showMessage('gameOver');
   };
 

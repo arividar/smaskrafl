@@ -4,8 +4,8 @@
 {Words} = require './nonfetlc.js'
 
 class Game
-	@TURN_TIME = 30000 # milliseconds
-	@MAX_MOVES = 5
+	@TURN_TIME = 60000 # milliseconds
+	@MAX_MOVES = 10
 
 	constructor: ->
 		@grid = new Grid

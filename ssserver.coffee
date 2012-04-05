@@ -99,10 +99,14 @@ resetTimer = (currPlayer, otherPlayer) ->
 	startTimer currPlayer, otherPlayer
 		
 sendGameOver = (theGame) ->
-	info = {winner: theGame.winnerc}
+	console.log "****** thegame: #{theGame}"
+	info = {winner:theGame.winner()}
+	console.log "****** info: #{JSON.stringify(info)}"
 	for player in theGame.players
 		playerInfo = extend {}, info, {yourNum: player.num}
-		idClientMap[player.id].send "gameOver: #{JSON.stringify playerInfo}"
+		idClientMap[player.id].send "gameOver: #{JSON.stringify(playerInfo)}"
+		console.log "********** Sent gameOver: #{JSON.stringify(playerInfo)}"
+ 
 
 welcomePlayers = (game) ->
 	info = {players: game.players, tiles: game.grid.tiles
