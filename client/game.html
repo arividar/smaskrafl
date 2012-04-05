@@ -1,58 +1,69 @@
 <html>
-	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
-		<title>S M Á S K R A F L</title>
-		<script type="text/javascript" src="jquery-1.7.1.min.js"></script>
-		<script type="text/javascript" src="jquery-ui-1.8.14.custom.min.js"></script>
-		<script type="text/javascript" src="/socket.io/socket.io.js"></script>
-		<script type="text/javascript" src="ssclient.js"></script>
-		<link rel="stylesheet" type="text/css" href="./style.css" /> 
-	</head>
-	<body>
-		<table id="gridtable" width="100%">
-			<tr>
-				<th id="meHeader">
-					<div id="meName" class="scoreName"></div>
-			       	</th>
-				<th id="gridHeader" align="center">
-					<div id="message"></div>
-			       	</th>
-				<th id="opponentHeader"> 
-					<div id="opponentName" class="scoreName"></div>
-				</th>
-			</tr>
-			<tr>
-				<td width="40%" id="meInfo" align="center">
-					<div id="meScore" class="score">0</div>
-				</td>
-				<td rowspan="3" id="centerArea">
-					<div id="grid"></div>
-				</td>
-				<td width="40%" id="opponentInfo" align="center">
-					<div id="opponentScore" class="score">0</div>
-				</td>
-			</tr>
-			<tr>
-				<td width="40%" align="center">
-					<div id="meTimer" class="timer colorGreen">0</div>
-				</td>
-				<td width="40%" align="center">
-					<div id="opponentTimer" class="timer colorRed">0</div>
-				</td>
-			</tr>
-			<tr>
-				<td width="40%" align="center" rowspan="3">
-					<div id="meMoveList" class="moveList"></div>
-				</td>
-				<td width="40%" align="center" rowspan="3">
-					<div id="opponentMoveList" class="moveList"></div>
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<div id="usedwords"></div>
-				</td>
-			</tr>
-		</table>
-	</body>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
+<title>S M Á S K R A F L</title>
+<script type="text/javascript" src="jquery-1.7.1.min.js"></script>
+<script type="text/javascript" src="jquery-ui-1.8.14.custom.min.js"></script>
+<script type="text/javascript" src="/socket.io/socket.io.js"></script>
+<script type="text/javascript" src="ssclient.js"></script>
+<link rel="stylesheet" type="text/css" href="./style.css" /> 
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-30644711-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+</head>
+<body>
+	<table id="gridtable" width="100%">
+		<tr>
+			<th id="meHeader">
+				<div id="meName" class="scoreName"></div>
+			</th>
+			<th id="gridHeader" align="center">
+				<div id="message"></div>
+			</th>
+			<th id="opponentHeader"> 
+				<div id="opponentName" class="scoreName"></div>
+			</th>
+		</tr>
+		<tr>
+			<td width="40%" id="meInfo" align="center">
+				<div id="meScore" class="score">0</div>
+			</td>
+			<td rowspan="3" id="centerArea">
+				<div id="grid"></div>
+			</td>
+			<td width="40%" id="opponentInfo" align="center">
+				<div id="opponentScore" class="score">0</div>
+			</td>
+		</tr>
+		<tr>
+			<td width="40%" align="center">
+				<div id="meTimer" class="timer colorGreen">0</div>
+			</td>
+			<td width="40%" align="center">
+				<div id="opponentTimer" class="timer colorRed">0</div>
+			</td>
+		</tr>
+		<tr>
+			<td width="40%" align="center" rowspan="3">
+				<div id="meMoveList" class="moveList"></div>
+			</td>
+			<td width="40%" align="center" rowspan="3">
+				<div id="opponentMoveList" class="moveList"></div>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<div id="usedwords"></div>
+			</td>
+		</tr>
+	</table>
+</body>
 </html>
