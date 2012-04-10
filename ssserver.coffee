@@ -12,8 +12,6 @@ app.use express.bodyParser()
 gameManager = new GameManager
 idClientMap = {}
 
-console.log 'CoffeeDir: ' + __dirname
-
 # simply return index.html
 app.get "/", (req, res) ->
 	res.sendfile "client/index.html"
@@ -32,7 +30,6 @@ socket = io.listen app
 
 socket.sockets.on 'connection', (client) ->
 	client.on 'login', (loginInfo) ->
-		console.log "************* login: #{loginInfo.playername}"
 		assignToGame client, loginInfo.playername
 		client.on 'message', (message) ->
 			handleMessage client, message
