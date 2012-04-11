@@ -1,6 +1,6 @@
 # Requires
-Game = require './Game'
-GameManager = require './GameManager'
+{Game} = require './Game'
+{GameManager} = require './GameManager'
 express = require 'express'
 io = require('socket.io')
 
