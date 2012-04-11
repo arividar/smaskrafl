@@ -1,40 +1,43 @@
-{Game} = require './Game'
-{GameManager} = require './GameManager'
+# Requires
+Game = require './Game'
+GameManager = require './GameManager'
 express = require 'express'
-
-app = express.createServer()
 io = require('socket.io')
 
+# Create server
+app = express.createServer()
 app.use express.static(__dirname + '/client')
 app.use express.errorHandler { showStacktrace: true, dumpExceptions: true }
 app.use express.bodyParser()
 
-gameManager = new GameManager
-idClientMap = {}
-
-# simply return index.html
+# Process client requests
 app.get "/", (req, res) ->
 	res.sendfile "client/index.html"
 
-# process client message
 app.post "/send", (req, res) ->
 	res.redirect "/game.html\?player=#{req.body.userName}"
 
+# Start server
 port = process.env.PORT || 3000
 console.log 'Listening to port '+port
 app.listen port
 console.log "Browse to http://localhost:#{port} to play"
 
-# bind socket to HTTP server
+# Bind socket to HTTP server
 socket = io.listen app
 
+# Handle client messages
 socket.sockets.on 'connection', (client) ->
 	client.on 'login', (loginInfo) ->
 		assignToGame client, loginInfo.playername
-		client.on 'message', (message) ->
-			handleMessage client, message
-		client.on 'disconnect', ->
-			removeFromGame client
+	client.on 'message', (message) ->
+		handleMessage client, message
+	client.on 'disconnect', ->
+		removeFromGame client
+
+# Game server
+gameManager = new GameManager
+idClientMap = {}
 
 assignToGame = (client, username) ->
 	idClientMap[client.id] = client
@@ -135,8 +138,8 @@ handleMessage = (client, message) ->
 			game.endTurn()
 			resetTimer game.currPlayer, game.otherPlayer
 
+# gather used words and defs - only send new ones
 getWords = (newWords) ->
-  # gather used words	and defs - only send new ones
 	wordsHtml = []
 	defs = {}
 	for word in newWords
