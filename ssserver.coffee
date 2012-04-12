@@ -1,8 +1,8 @@
 # Requires
-{Game} = require './Game'
-{GameManager} = require './GameManager'
 express = require 'express'
 io = require('socket.io')
+{Game} = require './Game'
+{GameManager} = require './GameManager'
 
 # Create server
 app = express.createServer()
@@ -62,12 +62,9 @@ removeFromGame = (client) ->
 # player loses turn if they take too long
 startTimer = (currPlayer, otherPlayer) ->
 	game = gameManager.getGameWithPlayer currPlayer
-	
 	# interval ticker for each second - fire before timer for safety's sake
 	game.interval = setInterval ->
-		console.log "***** in setInterval Parameter for interval ticker"
 		if game.isGameOver()
-			console.log "***** Game is over in a tick"
 			sendGameOver game
 		else
 			for player in game.players
@@ -76,13 +73,10 @@ startTimer = (currPlayer, otherPlayer) ->
 	# fire off first tick
 	for player in game.players
 		idClientMap[player.id].send "tick:#{JSON.stringify('tick')}"
-
 	# timer for turn
 	game.timer = setTimeout ->
-		console.log "***** in setTimeout parameter function"
 		currPlayer.moveCount++
 		if game.isGameOver()
-			console.log "***** Game is over in setTimeout"
 			sendGameOver
 		else
 			resetTimer otherPlayer, currPlayer
@@ -99,14 +93,10 @@ resetTimer = (currPlayer, otherPlayer) ->
 	startTimer currPlayer, otherPlayer
 		
 sendGameOver = (theGame) ->
-	console.log "****** thegame: #{theGame}"
 	info = {winner:theGame.winner()}
-	console.log "****** info: #{JSON.stringify(info)}"
 	for player in theGame.players
 		playerInfo = extend {}, info, {yourNum: player.num}
 		idClientMap[player.id].send "gameOver: #{JSON.stringify(playerInfo)}"
-		console.log "********** Sent gameOver: #{JSON.stringify(playerInfo)}"
- 
 
 welcomePlayers = (game) ->
 	info = {players: game.players, tiles: game.grid.tiles
@@ -123,9 +113,7 @@ handleMessage = (client, message) ->
 	game = gameManager.getGameWithPlayer client
 	if type is 'move'
 		return unless client.id is game.currPlayer.id #no cheating
-		console.log("****** in handle move message - isGameOver")
 		if game.isGameOver()
-			console.log("******send game over")
 			sendGameOver
 		else
 			swapCoordinates = JSON.parse content
@@ -134,7 +122,6 @@ handleMessage = (client, message) ->
 			# only send results to players, reset timer since move has been made
 			for player in game.players
 				idClientMap[player.id].send "moveResult:#{JSON.stringify result}"
-				console.log("*******moveresult: "+JSON.stringify(result))
 			game.endTurn()
 			resetTimer game.currPlayer, game.otherPlayer
 

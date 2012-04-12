@@ -1,27 +1,23 @@
 class Dictionary
-	@MIN_WORD_LENGTH: 3
+	@MIN_WORD_LENGTH: 4
 
 	constructor: (@originalWordList, grid) ->
 		@setGrid grid if grid?
 	
 	setGrid: (@grid) ->
-		@wordList = @originalWordList #make a copy of wordlist
-		@wordList = (word for word of @wordList when word.length <= @grid.size and word.length >= Dictionary.MIN_WORD_LENGTH)
+		@wordList = (word for word of @originalWordList when word.length <= @grid.size and word.length >= Dictionary.MIN_WORD_LENGTH)
 		@usedWords = []
 		for x in [0...@grid.size]
 			for y in [0...@grid.size]
 				@markUsed word for word in @wordsThroughTile x,y
 	
-	MinWordLength: ->
-		Dictionary_Word_Length
-		
 	markUsed: (str) ->
 		if str in @usedWords
 			false
 		else
 			@usedWords.push str
 			true
-	
+
 	isWord: (str) ->
 		str in @wordList
 
@@ -56,5 +52,6 @@ class Dictionary
 				# 	 grid.inRange(x - offset + range, y + offset - range) 
 				# 	addTiles (i) -> grid.tiles[x - offset + i][y + offset - i]
 		str for str in strings when @isWord str
+
 root = exports ? window
 root.Dictionary = Dictionary
