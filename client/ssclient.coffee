@@ -75,11 +75,11 @@ iceHTMLChar = (c) ->
 		else c
 
 getUrlVars = ->
-  vars = {}
-  parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/g, (m, key, value) ->
-    vars[key] = value
-  )
-  vars
+	  vars = {}
+	  parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/g, (m, key, value) ->
+		    vars[key] = value
+	  )
+	  vars
 
 # forced = true when last turn ended because a player took too long
 startTurn = (player, forced = false) ->
@@ -200,7 +200,6 @@ handleMessage = (message) ->
 			usedWords = {}
 			updateUsedWords newWords
 		when 'moveResult'
-			console.log('****got moveresult: '+content)
 			{player, swapCoordinates, moveScore, newWords} = JSON.parse content
 			showMoveResult player, swapCoordinates, moveScore, newWords
 			updateUsedWords newWords
@@ -213,14 +212,14 @@ handleMessage = (message) ->
 			player = JSON.parse content
 			startTurn(player, true)
 		when 'tick'
+			# tick for first tick of turn, tock for others
+			tick = JSON.parse content
 			if myTurn
 				turnTimer = "#meTimer"
 				nonTurnTimer = "#opponentTimer"
 			else
 				turnTimer = "#opponentTimer"
 				nonTurnTimer = "#meTimer"
-			tick = JSON.parse content
-			# tick for first tick of turn, tock for others
 			if tick is "tick"
 				$(turnTimer).html turnTime
 				$(nonTurnTimer).hide()
@@ -300,7 +299,6 @@ showMoveResult = (player, swapCoordinates, moveScore, newWords) ->
 	moveString = "<b>#{player.moveCount}: 0</b><br/>"
 	if words.length > 0
 		moveString = "<b>#{player.moveCount}: #{moveScore}</b> - #{words.join(', ')}<br/>"
-	console.log "*************** movestring=" + moveString
 	console.log player
 	if player.num is myNum
 		$("#meScore").html player.score
@@ -319,7 +317,6 @@ $(document).ready ->
 	pname = Url.decode urlVars["player"]
 	socket = io.connect()
 	socket.emit 'login', { playername:pname }
-	console.log "************** emitted " + pname
-	console.log "************** emitted " + { playername:pname }
-	socket.on 'connect', -> showMessage 'waitForConnection'
+	socket.on 'connect', ->
+		showMessage 'waitForConnection'
 	socket.on 'message', handleMessage

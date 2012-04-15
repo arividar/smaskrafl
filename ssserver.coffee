@@ -65,6 +65,7 @@ startTimer = (currPlayer, otherPlayer) ->
 	# interval ticker for each second - fire before timer for safety's sake
 	game.interval = setInterval ->
 		if game.isGameOver()
+			clearInterval game.interval
 			sendGameOver game
 		else
 			for player in game.players
@@ -99,9 +100,12 @@ sendGameOver = (theGame) ->
 		idClientMap[player.id].send "gameOver: #{JSON.stringify(playerInfo)}"
 
 welcomePlayers = (game) ->
-	info = {players: game.players, tiles: game.grid.tiles
-				 , currPlayerNum: game.currPlayer.num
-				 , newWords: getWords(game.dictionary.usedWords), turnTime: Game.TURN_TIME/1000}
+	info =
+		players: game.players
+		tiles: game.grid.tiles
+		currPlayerNum: game.currPlayer.num
+		newWords: getWords(game.dictionary.usedWords)
+		turnTime: Game.TURN_TIME/1000}
 	for player in game.players
 		playerInfo = extend {}, info, {yourNum: player.num}
 		idClientMap[player.id].send "welcome:#{JSON.stringify playerInfo}"
@@ -114,6 +118,7 @@ handleMessage = (client, message) ->
 	if type is 'move'
 		return unless client.id is game.currPlayer.id #no cheating
 		if game.isGameOver()
+			clearInterval game.interval
 			sendGameOver
 		else
 			swapCoordinates = JSON.parse content
