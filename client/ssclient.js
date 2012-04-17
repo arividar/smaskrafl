@@ -267,7 +267,6 @@
         usedWords = {};
         return updateUsedWords(newWords);
       case 'moveResult':
-        console.log('****got moveresult: ' + content);
         _ref3 = JSON.parse(content), player = _ref3.player, swapCoordinates = _ref3.swapCoordinates, moveScore = _ref3.moveScore, newWords = _ref3.newWords;
         showMoveResult(player, swapCoordinates, moveScore, newWords);
         return updateUsedWords(newWords);
@@ -280,6 +279,7 @@
         player = JSON.parse(content);
         return startTurn(player, true);
       case 'tick':
+        tick = JSON.parse(content);
         if (myTurn) {
           turnTimer = "#meTimer";
           nonTurnTimer = "#opponentTimer";
@@ -287,7 +287,6 @@
           turnTimer = "#opponentTimer";
           nonTurnTimer = "#meTimer";
         }
-        tick = JSON.parse(content);
         if (tick === "tick") {
           $(turnTimer).html(turnTime);
           $(nonTurnTimer).hide();
@@ -377,7 +376,6 @@
     if (words.length > 0) {
       moveString = "<b>" + player.moveCount + ": " + moveScore + "</b> - " + (words.join(', ')) + "<br/>";
     }
-    console.log("*************** movestring=" + moveString);
     console.log(player);
     if (player.num === myNum) {
       $("#meScore").html(player.score);
@@ -398,10 +396,6 @@
     pname = Url.decode(urlVars["player"]);
     socket = io.connect();
     socket.emit('login', {
-      playername: pname
-    });
-    console.log("************** emitted " + pname);
-    console.log("************** emitted " + {
       playername: pname
     });
     socket.on('connect', function() {

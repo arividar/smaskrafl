@@ -105,7 +105,7 @@ welcomePlayers = (game) ->
 		tiles: game.grid.tiles
 		currPlayerNum: game.currPlayer.num
 		newWords: getWords(game.dictionary.usedWords)
-		turnTime: Game.TURN_TIME/1000}
+		turnTime: Game.TURN_TIME/1000
 	for player in game.players
 		playerInfo = extend {}, info, {yourNum: player.num}
 		idClientMap[player.id].send "welcome:#{JSON.stringify playerInfo}"
