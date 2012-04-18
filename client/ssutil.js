@@ -1,7 +1,5 @@
 (function() {
-  var Url, getUrlVars, iceHTMLChar, myNum, socket;
-
-  socket = myNum = null;
+  var Url, getUrlVars, iceHTMLChar, root;
 
   Url = {
     encode: function(string) {
@@ -110,19 +108,12 @@
     return vars;
   };
 
-  $(document).ready(function() {
-    var pname, urlVars;
-    $('#grid li').live('click', tileClick);
-    urlVars = getUrlVars();
-    pname = Url.decode(urlVars["player"]);
-    socket = io.connect();
-    socket.emit('login', {
-      playername: pname
-    });
-    socket.on('connect', function() {
-      return showMessage('waitForConnection');
-    });
-    return socket.on('message', handleMessage);
-  });
+  root = typeof exports !== "undefined" && exports !== null ? exports : window;
+
+  root.iceHTMLChar = iceHTMLChar;
+
+  root.Url = Url;
+
+  root.getUrlVars = getUrlVars;
 
 }).call(this);
