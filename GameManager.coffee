@@ -5,7 +5,15 @@ class GameManager
 	constructor: ->
 		@games = []
 		@words = null
-	
+
+	getPlayerList: ->
+		console.log "********* IN GETPLAYERLIST!!!"
+		playerList = []
+		for g in @games
+			for p in g.players
+				playerList.push p.name
+		playerList
+
 	getNextAvailableGame: ->
 		# if there aren't any games, create a new one
 		if @games.length is 0
@@ -26,11 +34,10 @@ class GameManager
 				
 	numberOfPlayers: (game) ->
 		count = 0
-		if game.players?
+		if game?.players?
 			count++ for player in game.players when player.id isnt null
 			count++
-		else
-			count
+		count
 		
 	pruneEmptyGames: ->
 		for game in @games

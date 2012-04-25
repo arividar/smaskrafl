@@ -23,11 +23,24 @@ console.log 'Listening to port '+port
 app.listen port
 console.log "Browse to http://localhost:#{port} to play"
 
+# Game server
+gameManager = new GameManager
+idClientMap = {}
+
 # Bind socket to HTTP server
 socket = io.listen app
 
 # Handle client messages
 socket.sockets.on 'connection', (client) ->
+	client.on 'lobbyLogin', (loginInfo) ->
+		console.log "********** Got LobbyLogin #{JSON.stringify(loginInfo.playername)}"
+		idClientMap[client.id] = client
+		game = gameManager.getNextAvailableGame()
+		console.log "********** Got LobbyLogin #{idClientMap}/#{gameManager.getNextAvailableGame()}/#{gameManager.getPlayerList()}"
+		client.send "playerList:#{JSON.stringify(gameManager.getPlayerList().join(','))}"
+		for clientId, clientValue of idClientMap
+			console.log "********** about to send: newPlayer:#{JSON.stringify(loginInfo.playername)}"
+			clientValue.send "newPlayer:#{JSON.stringify(loginInfo.playername)}"
 	client.on 'login', (loginInfo) ->
 		assignToGame client, loginInfo.playername
 	client.on 'message', (message) ->
@@ -35,12 +48,7 @@ socket.sockets.on 'connection', (client) ->
 	client.on 'disconnect', ->
 		removeFromGame client
 
-# Game server
-gameManager = new GameManager
-idClientMap = {}
-
 assignToGame = (client, username) ->
-	idClientMap[client.id] = client
 	game = gameManager.getNextAvailableGame()
 	game.addPlayer client.id, username
 	if game.isFull()

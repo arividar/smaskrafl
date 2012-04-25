@@ -1,5 +1,5 @@
 (function() {
-  var Url, drawTiles, endGame, endTurn, getUrlVars, handleMessage, iceHTMLChar, myNum, myTurn, selectedCoordinates, showMessage, showMoveResult, showNotice, socket, startGame, startTurn, swapTiles, tileClick, tiles, toArray, turnColor, turnColorGreen, turnColorRed, turnColorYellow, turnTime, typeAndContent, updateUsedWords, usedWords;
+  var Url, drawTiles, endGame, endTurn, getUrlVars, handleMessage, iceHTMLChar, myNum, myTurn, root, selectedCoordinates, showMessage, showMoveResult, showNotice, socket, startGame, startTurn, swapTiles, tileClick, tiles, toArray, turnColor, turnColorGreen, turnColorRed, turnColorYellow, turnTime, typeAndContent, updateUsedWords, usedWords;
 
   socket = tiles = selectedCoordinates = myNum = myTurn = usedWords = turnTime = null;
 
@@ -117,6 +117,14 @@
     });
     return vars;
   };
+
+  root = typeof exports !== "undefined" && exports !== null ? exports : window;
+
+  root.iceHTMLChar = iceHTMLChar;
+
+  root.Url = Url;
+
+  root.getUrlVars = getUrlVars;
 
   startTurn = function(player, forced) {
     if (forced == null) forced = false;
