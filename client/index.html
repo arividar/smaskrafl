@@ -29,24 +29,25 @@
 	<p>&nbsp;</p>
 </div>
 <div id="ssInstructions">
-	Orðaleikur þar sem keppt er um að finna sem<br />
-	flest a.m.k. fjögurra stafa íslensk nafnorð í<br />
-	nefnifalli, eintölu og án greinis.<br />
+	Orðaleikur þar sem keppt er um að finna sem flest fjögurra stafa (eða lengri) íslensk<br />
+	nafnorð í nefnifalli, eintölu og án greinis.<br />
 	<p>&nbsp;</p>
 	<p>&nbsp;</p>
-	<p><b>ATH:</b>Einungis á að finna<br />
-	a.m.k. fjögurra stafa íslensk<br />
-	<b>NAFNORÐ</b> í <b>NEFNIFALLI</b> í <b>EINTÖLU</b> og <b>ÁN GREINIS.</b></p>
+	<p><b>ATH:</b>Einungis á að finna fjögurra stafa (eða lengri) íslensk <b>NAFNORÐ</b><br />
+	í <b>NEFNIFALLI</b> í <b>EINTÖLU</b> og <b>ÁN GREINIS.</b></p>
 	<p>&nbsp;</p>
 	<p>&nbsp;</p>
 </div>
-<div id="ssLoginAndLobby">
+<div id="ssLogin">
 	<label for="userName">Nafn&nbsp;</label>
 	<p>&nbsp;</p>
+	<form name="uNameForm">
 	<input name="userName" size="30" id="userName" />
 	<p>&nbsp;</p>
-	<a href="javascript: login(this.userName)"><img name="innskraning" src="innskraning.png" /></a>
+	<a href="javascript: login(this.userName.value)"><img name="innskraning" src="innskraning.png" /></a>
+	</form>
+</div>
+<div id="ssLobby">
 </div>
 </body>
 </html>
-

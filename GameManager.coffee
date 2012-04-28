@@ -3,8 +3,16 @@
 # Manages creation and deletion of games
 class GameManager
 	constructor: ->
+		@players = []
 		@games = []
 		@words = null
+
+	login: (name) ->
+		if not (name in @players)
+			@players.push name
+			true
+		else
+			false
 
 	getPlayerList: ->
 		console.log "********* IN GETPLAYERLIST!!!"

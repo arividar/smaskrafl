@@ -1,11 +1,9 @@
 (function() {
-  var handleMessage, login, logincount, myNum, root, socket, typeAndContent;
+  var handleMessage, login, myNum, playerList, root, socket, typeAndContent;
 
-  socket = myNum = null;
+  socket = myNum = playerList = null;
 
   root = typeof exports !== "undefined" && exports !== null ? exports : window;
-
-  logincount = 0;
 
   typeAndContent = function(message) {
     var content, ignore, type, _ref;
@@ -17,31 +15,35 @@
   };
 
   handleMessage = function(message) {
-    var content, plist, pname, type, _ref;
+    var content, player, plist, pname, type, _i, _len, _ref, _results;
     _ref = typeAndContent(message), type = _ref.type, content = _ref.content;
     switch (type) {
       case 'newPlayer':
         pname = JSON.parse(content);
-        return console.log("******** got newPlayer: " + pname + " from server");
+        $("#ssLogin").remove();
+        return $("#ssLobby").append("<h2>******* NewPlayer: " + pname + " </h2>");
+      case 'loginFail':
+        return $("#ssLogin").append("<h2>******* LOGIN FAILED!</h2>");
       case 'playerList':
         plist = JSON.parse(content);
-        return console.log("******** got playerlist: " + plist + " from server");
+        playerList = plist.split(',');
+        $("#ssLobby").append("<h4>" + plist + "</h4>");
+        _results = [];
+        for (_i = 0, _len = playerList.length; _i < _len; _i++) {
+          player = playerList[_i];
+          _results.push($("#ssLobby").append("<p>" + player + "</p>"));
+        }
+        return _results;
     }
   };
 
-  login = function(userNameField) {
-    logincount++;
-    $("#ssLobbyPage").html("<h1>************** L O G I N " + userNameField.value + " </h1>");
+  login = function(uname) {
+    socket = io.connect();
+    socket.on('message', handleMessage);
     return socket.emit('lobbyLogin', {
-      playername: userNameField.value
+      playername: uname
     });
   };
-
-  $(document).ready(function() {
-    console.log("************* R E A D Y! ");
-    socket = io.connect();
-    return socket.on('message', handleMessage);
-  });
 
   root = typeof exports !== "undefined" && exports !== null ? exports : window;
 

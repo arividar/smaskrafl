@@ -16,7 +16,7 @@
 	font-family: Monaco, "DejaVu Sans Mono", "Lucida Console", monospace;
 }
 
-#ssLoginAndLobby {
+#ssLogin {
 	position: relative;
 	text-align: center;
 	margin: 0px 0px;
@@ -25,5 +25,12 @@
 	font-family: Monaco, "DejaVu Sans Mono", "Lucida Console", monospace;
 }
 
-
+#ssLobby {
+	position: relative;
+	text-align: center;
+	margin: 0px 0px;
+	padding: 12px 0px;
+	border: 2px solid #FA5;
+	font-family: Monaco, "DejaVu Sans Mono", "Lucida Console", monospace;
+}
 

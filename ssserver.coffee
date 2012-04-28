@@ -31,21 +31,24 @@ idClientMap = {}
 socket = io.listen app
 
 # Handle client messages
-socket.sockets.on 'connection', (client) ->
-	client.on 'lobbyLogin', (loginInfo) ->
-		console.log "********** Got LobbyLogin #{JSON.stringify(loginInfo.playername)}"
-		idClientMap[client.id] = client
-		game = gameManager.getNextAvailableGame()
-		console.log "********** Got LobbyLogin #{idClientMap}/#{gameManager.getNextAvailableGame()}/#{gameManager.getPlayerList()}"
-		client.send "playerList:#{JSON.stringify(gameManager.getPlayerList().join(','))}"
-		for clientId, clientValue of idClientMap
-			console.log "********** about to send: newPlayer:#{JSON.stringify(loginInfo.playername)}"
-			clientValue.send "newPlayer:#{JSON.stringify(loginInfo.playername)}"
-	client.on 'login', (loginInfo) ->
+socket.sockets.on 'connection', (client) =>
+	client.on 'lobbyLogin', (loginInfo) =>
+		if gameManager.login(loginInfo.playername)
+			idClientMap[client.id] = client
+			client.send "playerList:#{JSON.stringify(gameManager.players.join(','))}"
+			game = gameManager.getNextAvailableGame()
+			for clientId, clientValue of idClientMap
+				console.log "********** about to send: newPlayer:#{JSON.stringify(loginInfo.playername)}"
+				clientValue.send "newPlayer:#{JSON.stringify(loginInfo.playername)}"
+		else
+			console.log("************ INVALID LOGIN: #{loginInfo.playername}")
+			client.send "loginFail"
+			#TODO: Respond and handle failed login
+	client.on 'login', (loginInfo) =>
 		assignToGame client, loginInfo.playername
-	client.on 'message', (message) ->
+	client.on 'message', (message) =>
 		handleMessage client, message
-	client.on 'disconnect', ->
+	client.on 'disconnect', =>
 		removeFromGame client
 
 assignToGame = (client, username) ->

@@ -1,7 +1,5 @@
-socket = myNum = null
+socket = myNum = playerList = null
 root = exports ? window
-
-logincount=0
 
 typeAndContent = (message) ->
 	[ignore, type, content] = message.match /(.*?):(.*)/
@@ -12,17 +10,21 @@ handleMessage = (message) ->
 	switch type
 		when 'newPlayer'
 			pname = JSON.parse content
-			console.log "******** got newPlayer: #{pname} from server"
+			$("#ssLogin").remove()
+			$("#ssLobby").append "<h2>******* NewPlayer: #{pname} </h2>"
+		when 'loginFail'
+			$("#ssLogin").append "<h2>******* LOGIN FAILED!</h2>"
 		when 'playerList'
 			plist = JSON.parse content
-			console.log "******** got playerlist: #{plist} from server"
+			playerList = plist.split(',')
+			$("#ssLobby").append "<h4>#{plist}</h4>"
+			for player in playerList
+				$("#ssLobby").append "<p>#{player}</p>"
 
-login = (userNameField) ->
-	logincount++
-	$("#ssLobbyPage").html "<h1>************** L O G I N #{userNameField.value} </h1>"
-	socket.emit 'lobbyLogin', { playername:userNameField.value }
-
-$(document).ready ->
-	console.log "************* R E A D Y! "
+login = (uname) ->
 	socket = io.connect()
 	socket.on 'message', handleMessage
+	socket.emit 'lobbyLogin', { playername:uname }
+
+root = exports ? window
+root.login = login
