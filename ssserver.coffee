@@ -32,24 +32,21 @@ socket = io.listen app
 
 # Handle client messages
 socket.sockets.on 'connection', (client) =>
-	client.on 'lobbyLogin', (loginInfo) =>
+	client.on 'login', (loginInfo) =>
 		if gameManager.login(loginInfo.playername)
 			idClientMap[client.id] = client
-			client.send "playerList:#{JSON.stringify(gameManager.players.join(','))}"
-			game = gameManager.getNextAvailableGame()
 			for clientId, clientValue of idClientMap
-				console.log "********** about to send: newPlayer:#{JSON.stringify(loginInfo.playername)}"
-				clientValue.send "newPlayer:#{JSON.stringify(loginInfo.playername)}"
+				clientValue.send "newPlayer:#{JSON.stringify(loginInfo.playername)}" if clientId isnt client.id
+			client.send "playerList:#{JSON.stringify(gameManager.players.join(','))}"
+			# assignToGame client, loginInfo.playername
 		else
-			console.log("************ INVALID LOGIN: #{loginInfo.playername}")
+			#TODO: Respond and handle failed loginxxx
 			client.send "loginFail"
-			#TODO: Respond and handle failed login
-	client.on 'login', (loginInfo) =>
-		assignToGame client, loginInfo.playername
 	client.on 'message', (message) =>
 		handleMessage client, message
 	client.on 'disconnect', =>
-		removeFromGame client
+		# removeFromGame client
+		delete idClientMap[client.id]
 
 assignToGame = (client, username) ->
 	game = gameManager.getNextAvailableGame()
@@ -58,7 +55,6 @@ assignToGame = (client, username) ->
 		welcomePlayers(game)
 
 removeFromGame = (client) ->
-	delete idClientMap[client.id]
 	#remove player from game
 	game = gameManager.getGameWithPlayer client
 	game.removePlayer client.id
