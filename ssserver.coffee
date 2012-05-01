@@ -4,6 +4,8 @@ io = require('socket.io')
 {Game} = require './Game'
 {GameManager} = require './GameManager'
 
+console.log('***** dirname: '+__dirname + '/client')
+
 # Create server
 app = express.createServer()
 app.use express.static(__dirname + '/client')

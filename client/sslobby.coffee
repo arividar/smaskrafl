@@ -12,19 +12,30 @@ handleMessage = (message) ->
 			$("#ssLogin").append "<h2>******* LOGIN FAILED!</h2>"
 		when 'newPlayer'
 			pname = JSON.parse content
-			$("#ssLobby").append "<h2>******* NewPlayer: #{pname} </h2>"
+			showPlayerList(pname)
 		when 'playerList'
 			plist = JSON.parse content
 			playerList = plist.split(',')
 			$("#ssLogin").remove()
-			$("#ssLobby").append "<h4>#{plist}</h4>"
-			for player in playerList
-				$("#ssLobby").append "<p>#{player}</p>"
+			showPlayerList()
 
 login = (uname) ->
 	socket = io.connect()
 	socket.on 'message', handleMessage
 	socket.emit 'login', { playername:uname }
+
+showPlayerList = (pname) ->
+	playerList.push(pname) if pname?
+	$('#playerList').html playerListToHtml(playerList)
+
+playerListToHtml = (plist) ->
+	plistHtml = ''
+	for player in plist.sort()
+		plistHtml = "#{plistHtml}, <a href=\"javascript:sendPlayerInvite(\'#{player}\')\">#{player}</a>"
+	plistHtml
+
+sendPlayerInvite = (toPlayer) ->
+	console.log("****** sending invite to #{toPlayer}")
 
 root = exports ? window
 root.login = login

@@ -52,7 +52,7 @@
       player = _ref[_i];
       plistHtml = "" + plistHtml + ", <a href=\"javascript:sendPlayerInvite(\'" + player + "\')\">" + player + "</a>";
     }
-    return playerListHtml;
+    return plistHtml;
   };
 
   sendPlayerInvite = function(toPlayer) {
