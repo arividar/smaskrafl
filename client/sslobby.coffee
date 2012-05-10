@@ -14,19 +14,22 @@ handleMessage = (message) ->
 			pname = JSON.parse content
 			showPlayerList(pname)
 		when 'playerList'
+			console.log '****** got playerlist'
 			plist = JSON.parse content
 			playerList = plist.split(',')
 			$("#ssLogin").remove()
 			showPlayerList()
 
 login = (uname) ->
+	console.log '****** logging in!'
 	socket = io.connect()
 	socket.on 'message', handleMessage
 	socket.emit 'login', { playername:uname }
 
 showPlayerList = (pname) ->
+	console.log '************ showing player list'
 	playerList.push(pname) if pname?
-	$('#playerList').html playerListToHtml(playerList)
+	$('#ssLobby').html playerListToHtml(playerList)
 
 playerListToHtml = (plist) ->
 	plistHtml = ''
