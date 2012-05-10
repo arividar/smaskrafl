@@ -7,6 +7,7 @@
 }
 
 #ssInstructions {
+	width: 90%;
 	position: relative;
 	text-align: center;
 	margin: 0px 0px;
@@ -15,6 +16,7 @@
 }
 
 #ssLogin {
+	width: 90%;
 	position: relative;
 	text-align: center;
 	margin: 0px 0px;
@@ -23,23 +25,27 @@
 }
 
 #ssLobby {
+	width: 90%;
 	position: relative;
 	text-align: center;
-	margin: 0px 0px;
+	margin: 8px auto;
+	background: #ddd;
 	padding: 12px 0px;
 	font-family: Monaco, "DejaVu Sans Mono", "Lucida Console", monospace;
+	border-width: thin; 
+	border-color: black;	
+	border-style: outset;
+	display: none;
 }
 
 #playerList {
-	width: 80%;
+	width: 90%;
 	position: relative;
-	text-align: left;
+	text-align: center;
+	line-height: 180%;
 	margin: 8px auto;
 	background: #ddd;
 	font-size: 16px;
 	padding: 12px;
-	border-width: thin; 
-	border-color: black;	
-	border-style: outset;
 }
 
