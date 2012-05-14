@@ -7,7 +7,7 @@ class Game
 	@TURN_TIME = 60000 # milliseconds
 	@MAX_MOVES = 10
 
-	constructor: ->
+	constructor: (@player1, @player2) ->
 		@grid = new Grid
 		@dictionary = new Dictionary(Words, @grid)
 		@currPlayer = @player1 = new Player(1, 'Player 1', @dictionary)

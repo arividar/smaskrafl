@@ -17,22 +17,21 @@ scoreMove = (dictionary, swapCoordinates) ->
 	{moveScore, newWords}
 
 class Player
-	constructor: (@num, @name, dictionary) ->
-		@setDictionary dictionary if dictionary?
-	
+	constructor: (@num, @name) ->
+
 	setDictionary: (@dictionary) ->
 		@score = 0
 		@moveCount = 0
-	
+
 	makeMove: (swapCoordinates) ->
 		@dictionary.grid.swap swapCoordinates
 		@moveCount++
 		result = scoreMove @dictionary, swapCoordinates
 		@score += result.moveScore
 		result
-	
+
 	toJSON: ->
 		{@num, @name, @score, @moveCount}
-	
+
 root = exports ? window
 root.Player = Player

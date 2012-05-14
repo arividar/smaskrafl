@@ -35,19 +35,23 @@ socket = io.listen app
 # Handle client messages
 socket.sockets.on 'connection', (client) =>
 	client.on 'login', (loginInfo) =>
-		if gameManager.login(loginInfo.playername)
+		if gameManager.login(client.id, loginInfo.playername)
 			idClientMap[client.id] = client
-			for clientId, clientValue of idClientMap
-				clientValue.send "newPlayer:#{JSON.stringify(loginInfo.playername)}" if clientId isnt client.id
-			client.send "playerList:#{JSON.stringify(gameManager.players.join(','))}"
+			for id, c of idClientMap
+				c.send "newPlayer:#{JSON.stringify(loginInfo.playername)}" if id isnt client.id
+			client.send "playerList:#{JSON.stringify((p.name for p in gameManager.players).join(','))}"
 			# assignToGame client, loginInfo.playername
 		else
-			#TODO: Respond and handle failed loginxxx
 			client.send "loginFail"
+			#TODO: Respond and handle failed loginxxx
 	client.on 'message', (message) =>
 		handleMessage client, message
 	client.on 'disconnect', =>
 		# removeFromGame client
+		p = gameManager.getPlayerById(client.id)
+		for id, c of idClientMap
+			c.send "removePlayer:#{JSON.stringify(p.name)}" if id isnt client.id
+		gameManager.logout client.id
 		delete idClientMap[client.id]
 
 assignToGame = (client, username) ->
@@ -123,21 +127,25 @@ welcomePlayers = (game) ->
 	
 handleMessage = (client, message) ->
 	{type, content} = typeAndContent message
-	game = gameManager.getGameWithPlayer client
-	if type is 'move'
-		return unless client.id is game.currPlayer.id #no cheating
-		if game.isGameOver()
-			clearInterval game.interval
-			sendGameOver
-		else
-			swapCoordinates = JSON.parse content
-			{moveScore, newWords} = game.currPlayer.makeMove swapCoordinates
-			result = {swapCoordinates, moveScore, player: game.currPlayer, newWords: getWords(newWords)}
-			# only send results to players, reset timer since move has been made
-			for player in game.players
-				idClientMap[player.id].send "moveResult:#{JSON.stringify result}"
-			game.endTurn()
-			resetTimer game.currPlayer, game.otherPlayer
+	switch type
+		when 'invite'
+			console.log "**** sending invite from #{client.id} to #{content}"
+		when 'move'
+			game = gameManager.getGameWithPlayer client
+			return unless client.id is game.currPlayer.id #no cheating
+			if game.isGameOver()
+				clearInterval game.interval
+				sendGameOver
+			else
+				swapCoordinates = JSON.parse content
+				{moveScore, newWords} = game.currPlayer.makeMove swapCoordinates
+				result = {swapCoordinates, moveScore, player: game.currPlayer, newWords: getWords(newWords)}
+				# only send results to players, reset timer since move has been made
+				for player in game.players
+					idClientMap[player.id].send "moveResult:#{JSON.stringify result}"
+				game.endTurn()
+				resetTimer game.currPlayer, game.otherPlayer
+
 
 # gather used words and defs - only send new ones
 getWords = (newWords) ->

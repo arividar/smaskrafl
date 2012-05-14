@@ -13,6 +13,10 @@ handleMessage = (message) ->
 		when 'newPlayer'
 			pname = JSON.parse content
 			showPlayerList(pname)
+		when 'removePlayer'
+			pname = JSON.parse content
+			delete playerList[pname]
+			showPlayerList()
 		when 'playerList'
 			plist = JSON.parse content
 			playerList = plist.split(',')
@@ -43,6 +47,7 @@ playerListToHtml = (plist) ->
 
 sendPlayerInvite = (toPlayer) ->
 	console.log("****** sending invite to #{toPlayer}")
+	socket.send "invite:#{JSON.stringify(toPlayer)}"
 
 root = exports ? window
 root.login = login

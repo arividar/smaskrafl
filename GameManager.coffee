@@ -1,3 +1,4 @@
+{Player} = require "./Player"
 {Game} = require "./Game"
 
 # Manages creation and deletion of games
@@ -7,20 +8,22 @@ class GameManager
 		@games = []
 		@words = null
 
-	login: (name) ->
+	login: (id, name) ->
 		if not (name in @players)
-			@players.push name
+			@players.push(new Player(id, name))
 			true
 		else
 			false
+	logout: (id) ->
+		#tbd
 
-	getPlayerList: ->
-		console.log "********* IN GETPLAYERLIST!!!"
-		playerList = []
-		for g in @games
-			for p in g.players
-				playerList.push p.name
-		playerList
+	getPlayerById: (id) ->
+		for player in @players
+			return player if player.id is id
+
+	getPlayerByName: (name) ->
+		for player in @players
+			return player if player.name is name
 
 	getNextAvailableGame: ->
 		# if there aren't any games, create a new one
@@ -29,17 +32,17 @@ class GameManager
 			@words = @games[0].dictionary.originalWordList
 		# or if all games are full, create a new one 		
 		else if @games[@games.length - 1].isFull()
-			@games.push new Game
+			@games.push new Game(new Player(1, 'Player 1'), new Player(1, 'Player 1'))
 		# otherwise check if we are re-using old game and reset if necessary
 		else if @games[@games.length - 1].wasPlayed is true
 			@games[@games.length - 1].reset()
 		@games[@games.length - 1]
-		
+
 	getGameWithPlayer: (client) ->
 		for game in @games
 			for player in game.players
 				return game if player.id is client.id
-				
+
 	numberOfPlayers: (game) ->
 		count = 0
 		if game?.players?
