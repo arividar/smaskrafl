@@ -162,6 +162,7 @@ getWords = (newWords) ->
 	{wordsHtml: wordsHtml.join(", "), defs}
 	
 typeAndContent = (message) ->
+	console.log "*********** The message is: #{message}"
 	[ignore, type, content] = message.match /(.*?):(.*)/
 	{type, content}
 

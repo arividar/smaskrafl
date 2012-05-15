@@ -53,7 +53,7 @@ playerListToHtml = (plist) ->
 
 sendPlayerInvite = (toPlayer) ->
 	console.log("****** sending invite to #{toPlayer}")
-	socket.send "invite:#{JSON.stringify(toPlayer)}"
+	socket.send "invite:#{toPlayer}"
 
 root = exports ? window
 root.login = login
