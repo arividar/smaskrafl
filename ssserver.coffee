@@ -129,7 +129,12 @@ handleMessage = (client, message) ->
 	{type, content} = typeAndContent message
 	switch type
 		when 'invite'
-			console.log "**** sending invite from #{client.id} to #{content}"
+			inviter = gameManager.getPlayerById(client.id)
+			invitee = gameManager.getPlayerByName(content)
+			console.log "**** sending invite from #{inviter.name} to #{invitee.name}"
+			if invitee? and inviter?
+				console.log "**** sending invite from #{inviter.name} to #{content} to client #{invitee.id}"
+				idClientMap[invitee.id].send "invite:#{JSON.stringify inviter.name}"
 		when 'move'
 			game = gameManager.getGameWithPlayer client
 			return unless client.id is game.currPlayer.id #no cheating

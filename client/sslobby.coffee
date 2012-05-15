@@ -15,13 +15,18 @@ handleMessage = (message) ->
 			showPlayerList(pname)
 		when 'removePlayer'
 			pname = JSON.parse content
-			delete playerList[pname]
+			console.log "******** removePlayer #{pname}"
+			i = playerList.indexOf(pname)
+			playerList.splice(i, 1) if i >= 0
 			showPlayerList()
 		when 'playerList'
 			plist = JSON.parse content
 			playerList = plist.split(',')
 			$("#ssLogin").remove()
 			showPlayerList()
+		when 'invite'
+			console.log "****** got invite from #{content}"
+			$('#ssLobby').html "<h1>INVITE FROM #{content}"
 
 login = (uname) ->
 	myName = uname
@@ -30,6 +35,7 @@ login = (uname) ->
 	socket.emit 'login', { playername:uname }
 
 showPlayerList = (pname) ->
+	console.log "******* showing playerlisthtml: #{playerListToHtml(playerList)}"
 	playerList.push(pname) if pname?
 	$('#ssLobby').show()
 	$('#playerList').html playerListToHtml(playerList)

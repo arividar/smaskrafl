@@ -17,7 +17,7 @@ scoreMove = (dictionary, swapCoordinates) ->
 	{moveScore, newWords}
 
 class Player
-	constructor: (@num, @name) ->
+	constructor: (@id, @name) ->
 
 	setDictionary: (@dictionary) ->
 		@score = 0
@@ -31,7 +31,7 @@ class Player
 		result
 
 	toJSON: ->
-		{@num, @name, @score, @moveCount}
+		{@id, @name, @score, @moveCount}
 
 root = exports ? window
 root.Player = Player

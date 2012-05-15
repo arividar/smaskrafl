@@ -14,15 +14,20 @@ class GameManager
 			true
 		else
 			false
-	logout: (id) ->
-		#tbd
 
+	logout: (id) ->
+		i = @players.indexOf(id)
+		@players.splice(i, 1) if i >= 0
+		#todo: remove from games if any!
+		
 	getPlayerById: (id) ->
 		for player in @players
 			return player if player.id is id
 
 	getPlayerByName: (name) ->
+		console.log "******** #{name}"
 		for player in @players
+			console.log "****** #{player.name} is maybe #{name}"
 			return player if player.name is name
 
 	getNextAvailableGame: ->
