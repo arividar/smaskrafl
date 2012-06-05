@@ -28,6 +28,7 @@ console.log "Browse to http://localhost:#{port} to play"
 # Game server
 gameManager = new GameManager
 idClientMap = {}
+pendingInvitations = []
 
 # Bind socket to HTTP server
 socket = io.listen app
@@ -110,7 +111,7 @@ sendGameOver = (theGame) ->
 	info = {winner:theGame.winner()}
 	for player in theGame.players
 		playerInfo = extend {}, info, {yourNum: player.num}
-		idClientMap[player.id].send "gameOver: #{JSON.stringify(playerInfo)}"
+		idClientMap[player.id].send "gameOver:#{JSON.stringify(playerInfo)}"
 
 welcomePlayers = (game) ->
 	info =
@@ -131,10 +132,16 @@ handleMessage = (client, message) ->
 		when 'invite'
 			inviter = gameManager.getPlayerById(client.id)
 			invitee = gameManager.getPlayerByName(content)
-			console.log "**** sending invite from #{inviter.name} to #{invitee.name}"
 			if invitee? and inviter?
-				console.log "**** sending invite from #{inviter.name} to #{content} to client #{invitee.id}"
-				idClientMap[invitee.id].send "invite:#{JSON.stringify inviter.name}"
+				forwardInvitation(invitee, inviter)
+			else
+				console.log("**************** ERROR: Missing inviter or invitee")
+		when 'inviteResponse'
+			inviter = gameManager.getPlayerById(client.id)
+			if invitee? and inviter?
+				handleInviteResponse(inviter.name, content)
+			else
+				console.log("**************** ERROR: Missing inviter or invitee")
 		when 'move'
 			game = gameManager.getGameWithPlayer client
 			return unless client.id is game.currPlayer.id #no cheating
@@ -171,3 +178,30 @@ extend = (a, others...) ->
 	for o in others
 		a[key] = val for key, val of o
 	a
+
+forwardInvitation = (from, to) ->
+	for i in pendingInvitations
+		if from.name is i.from or from.name is i.to or to.name is i.from or to.name is i.to
+			# TODO: Invitation exists and should not be forwarded
+			idClientMap[from.id].send "inviteResponse:no"
+			console.log "**** invitation already exists for either #{from} or #{to}"
+			return false
+	pendingInvitations.push { from: from.name, to: to.name }
+	console.log "**** forwarding invite from #{from.name} to #{to.name}"
+	idClientMap[to.id].send "inviteFrom:#{from.name}"
+	return true
+
+handleInviteResponse = (inviteeName, response) ->
+	index = 0
+	for invitation in pendingInvitations
+		if invitation.from is inviteeName
+			inviter = gameManager.getPlayerByName(inviteeName)
+			idClientMap[from.id].send "inviteResponse:#{response}"
+			index = pendingInvitations.indexOf(invitation)
+			pendingInvitations.splice(index, 1) if i >= 0
+			return true
+		index = index + 1
+	console.log "*********** ERROR: Missing invitation from #{from}"
+	return false
+
+

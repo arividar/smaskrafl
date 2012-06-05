@@ -29,6 +29,7 @@ class GameManager
 		for player in @players
 			console.log "****** #{player.name} is maybe #{name}"
 			return player if player.name is name
+		null
 
 	getNextAvailableGame: ->
 		# if there aren't any games, create a new one
@@ -82,4 +83,3 @@ class GameManager
 								
 root = exports ? window
 root.GameManager = GameManager
-	
