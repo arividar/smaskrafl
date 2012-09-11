@@ -238,8 +238,7 @@ handleMessage = (message) ->
 		when 'gameOver'
 			{winner, yourNum:myNum} = JSON.parse content
 			endGame(winner)
-		when 'inviteResponse'
-
+		# when 'inviteResponse'
 
 typeAndContent = (message) ->
 	[ignore, type, content] = message.match /(.*?):(.*)/
