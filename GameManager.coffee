@@ -1,6 +1,7 @@
 {Player} = require "./Player"
 {Game} = require "./Game"
 
+
 # Manages creation and deletion of games
 class GameManager
 	constructor: ->

@@ -46,6 +46,7 @@ socket.sockets.on 'connection', (client) =>
 			client.send "loginFail"
 			#TODO: Respond and handle failed loginxxx
 	client.on 'message', (message) =>
+		console.log "************** ssServer got message from client #{client.id}:#{message}"
 		handleMessage client, message
 	client.on 'disconnect', =>
 		# removeFromGame client
@@ -133,7 +134,7 @@ handleMessage = (client, message) ->
 			inviter = gameManager.getPlayerById(client.id)
 			invitee = gameManager.getPlayerByName(content)
 			if invitee? and inviter?
-				forwardInvitation(invitee, inviter)
+				forwardInvitation(inviter, invitee)
 			else
 				console.log("**************** ERROR: Missing inviter or invitee")
 		when 'inviteResponse'

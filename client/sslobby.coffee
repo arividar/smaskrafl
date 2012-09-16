@@ -71,40 +71,47 @@ handleInviteRequest = (fromPlayer) ->
 		return
 	myState = ClientState.INVITE_RECEIVED
 	console.log "****** got invite from #{fromPlayer}"
-	$('#ssLobby').html "<h1>#{fromPlayer} vill spila við þig</h1>"
-	$('#ssLobby').append "<p><a href=\"javascript:sendInviteResponse(true)\">Já</a></p>"
-	$('#ssLobby').append "<p><a href=\"javascript:sendInviteResponse(false)\">Nei</a></p>"
+	$('#ssLobby').html "<h2>#{fromPlayer} vill spila við þig. Viltu spila?</h2>"
+	$('#ssLobby').append "<h3><a href=\"javascript:sendInviteResponse(true)\">Já</a></h3>"
+	$('#ssLobby').append "<h3><a href=\"javascript:sendInviteResponse(false)\">Nei</a></h3>"
 
 handleInviteResponse = (response) ->
 	if myState isnt ClientState.INVITE_SENT or not pendingInviteToPlayer?
 		console.log "******* ERROR: got invite response but state not INVITE_SENT. Player invited: #{pendingInviteToPlayer}"
-		#TODO: Cleanup
+		$('#ssLobby').html "<h1>ERROR - got initation response when no invite sent! #{pendingInviteToPlayer}</h1>"
+		showPlayerList()
+		pendingInviteToPlayer = null
+		myState = ClientState.IN_LOBBY
 		return
-	if respons isnt 'yes' and response isnt 'no'
-		console.log "******* ERROR: Got inviteResponse that is neiter yes or no. Player invited: #{pendingInviteToPlayer}"
-		#TODO: Cleanup
-		return
-	if response is 'no'
+	if response isnt 'yes'
 		console.log "****** got invite decline from #{pendingInviteToPlayer}"
 		$('#ssLobby').html "<h1>INVITE DECLINED BY #{pendingInviteToPlayer}</h1>"
 		showPlayerList()
 		pendingInviteToPlayer = null
 		myState = ClientState.IN_LOBBY
-	else
-		console.log "****** got invite accepted from #{pendingInviteToPlayer} but not in IN_LOBBY State"
-		$('#ssLobby').html "<h1>INVITE ACCEPTED BY #{pendingInviteToPlayer}</h1>"
-		showPlayerList()
-		pendingInviteToPlayer = null
-		myState = ClientState.IN_LOBBY
+		return
+	# Invitation response is 'yes':
+	console.log "****** got invite accepted from #{pendingInviteToPlayer}  - should redirect to ssClient"
+	$('#ssLobby').html "<h1>INVITE ACCEPTED BY #{pendingInviteToPlayer} - should redirect to ssClient</h1>"
+	self.location = "game.html"
+	showPlayerList()
+	pendingInviteToPlayer = null
+	myState = ClientState.READY_TO_PLAY
 
 sendInviteResponse = (yesIWantToPlay) ->
 	if myState isnt ClientState.INVITE_RECEIVED
 		console.log '************ ERROR - should be INVITE_RECEIVED'
+		$('#ssLobby').html "<h1>ERROR - should be INVITE_RECEIVED #{pendingInviteToPlayer}</h1>"
 		return
 	if yesIWantToPlay
+		console.log '********** YES I will play - redirect to ssClient'
+		$('#ssLobby').html "<h1>YES will play - should redirect to ssClient"
 		myState = ClientState.READY_TO_PLAY
 		socket.emit 'inviteResponse:yes'
+		self.location="game.html"
 	else
+		console.log '********** NO I will not play'
+		$('#ssLobby').html "<h1>NO will play"
 		myState = ClientState.IN_LOBBY
 		socket.emit 'inviteResponse:no'
 
@@ -118,3 +125,4 @@ sendPlayerInvite = (toPlayer) ->
 root = exports ? window
 root.login = login
 root.sendPlayerInvite = sendPlayerInvite
+root.sendInviteResponse = sendInviteResponse
