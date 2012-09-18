@@ -138,11 +138,11 @@ handleMessage = (client, message) ->
 			else
 				console.log("**************** ERROR: Missing inviter or invitee")
 		when 'inviteResponse'
-			inviter = gameManager.getPlayerById(client.id)
-			if invitee? and inviter?
-				handleInviteResponse(inviter.name, content)
+			invitee = gameManager.getPlayerById(client.id)
+			if invitee? 
+				handleInviteResponse(invitee.name, content)
 			else
-				console.log("**************** ERROR: Missing inviter or invitee")
+				console.log("**************** ERROR: Missing invitee")
 		when 'move'
 			game = gameManager.getGameWithPlayer client
 			return unless client.id is game.currPlayer.id #no cheating
@@ -195,14 +195,13 @@ forwardInvitation = (from, to) ->
 handleInviteResponse = (inviteeName, response) ->
 	index = 0
 	for invitation in pendingInvitations
-		if invitation.from is inviteeName
-			inviter = gameManager.getPlayerByName(inviteeName)
-			idClientMap[from.id].send "inviteResponse:#{response}"
+		if invitation.to is inviteeName
+			inviter = gameManager.getPlayerByName(invitation.from)
+			# TODO: if not found!
+			idClientMap[inviter.id].send "inviteResponse:#{response}"
 			index = pendingInvitations.indexOf(invitation)
 			pendingInvitations.splice(index, 1) if i >= 0
 			return true
 		index = index + 1
-	console.log "*********** ERROR: Missing invitation from #{from}"
+	console.log "*********** ERROR: Missing invitation from #{inviteeName}"
 	return false
-
-

@@ -107,13 +107,13 @@ sendInviteResponse = (yesIWantToPlay) ->
 		console.log '********** YES I will play - redirect to ssClient'
 		$('#ssLobby').html "<h1>YES will play - should redirect to ssClient"
 		myState = ClientState.READY_TO_PLAY
-		socket.emit 'inviteResponse:yes'
-		self.location="game.html"
+		socket.send 'inviteResponse:yes'
+		# self.location = "game.html"
 	else
 		console.log '********** NO I will not play'
 		$('#ssLobby').html "<h1>NO will play"
 		myState = ClientState.IN_LOBBY
-		socket.emit 'inviteResponse:no'
+		socket.send 'inviteResponse:no'
 
 sendPlayerInvite = (toPlayer) ->
 	console.log("****** sending invite to #{toPlayer}")
