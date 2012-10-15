@@ -38,33 +38,62 @@ socket.sockets.on 'connection', (client) =>
 	client.on 'login', (loginInfo) =>
 		if gameManager.login(client.id, loginInfo.playername)
 			idClientMap[client.id] = client
+			console.log "************** login - climap=#{idClientMap}"
 			for id, c of idClientMap
+				console.log "************** login - climapid - id=#{id}, c.id=#{c.id}, len=#{(val for key, val of idClientMap).length}"
 				c.send "newPlayer:#{JSON.stringify(loginInfo.playername)}" if id isnt client.id
-			client.send "playerList:#{JSON.stringify((p.name for p in gameManager.players).join(','))}"
-			# assignToGame client, loginInfo.playername
+			logClientIdMap()
+			client.send "playerList:#{JSON.stringify((p.name for p in gameManager.players).join(','))}"		
 		else
 			client.send "loginFail"
 			#TODO: Respond and handle failed loginxxx
+	client.on 'newGame', (thePlayers) =>
+		console.log "************** ssServer got newGame from client #{client.id}:#{thePlayers}"
+		{ p1, p2 } = JSON.parse thePlayers
+		console.log "************** on.newgame p1=#{p1}, p2=#{p2}"
+		console.log "************* on.newGame idclimap.len=#{(val for key, val of idClientMap).length}"
+		logClientIdMap()
+		for id, c of idClientMap
+			console.log "************** on newgame - climapid - c.id=#{c.id}, id=#{id}"
+		newGame(client, p1, p2)
 	client.on 'message', (message) =>
 		console.log "************** ssServer got message from client #{client.id}:#{message}"
 		handleMessage client, message
 	client.on 'disconnect', =>
 		# removeFromGame client
+		console.log "***** disconnect"
 		p = gameManager.getPlayerById(client.id)
 		for id, c of idClientMap
 			c.send "removePlayer:#{JSON.stringify(p.name)}" if id isnt client.id
 		gameManager.logout client.id
 		delete idClientMap[client.id]
+		logClientIdMap()
 
-assignToGame = (client, username) ->
-	game = gameManager.getNextAvailableGame()
-	game.addPlayer client.id, username
+logClientIdMap = ->
+	console.log "************** logclimapid - LEN=#{(val for key, val of idClientMap).length}"
+	for id, c of idClientMap
+		console.log "************** logclimapid - id=#{id}, c.id=#{c.id}, len=#{(val for key, val of idClientMap).length}"
+
+newGame = (client, username, opponent) ->
+	console.log "************** newGame - player1=#{username}, player2=#{opponent}"
+	console.log "************** newGame -  idclimap.len=#{(val for key, val of idClientMap).length}"
+	for i, c of idClientMap
+		console.log "*******newGame - #{client.id} sama og #{c.id}?"
+		if c.id is client.id 
+			console.log "********newGAme - found client: #{client.id}"
+	# TBD: hér þarf að breyta til að gangsetja leikinn!!!
+	game = gameManager.getGameByPlayerName(opponent)
+	if !game?
+		console.log "**** newGame1: getting another game"
+		game = gameManager.getNewGame() 
+	console.log "**** newGame2: the game is: #{game.wasPlayed}"
+	game.addPlayer(client.id, username)
 	if game.isFull()
 		welcomePlayers(game)
 
 removeFromGame = (client) ->
 	#remove player from game
-	game = gameManager.getGameWithPlayer client
+	game = gameManager.getGameByPlayerId client
 	game.removePlayer client.id
 	# remove timer and interval when player disconects and notify remaining player
 	clearTimeout game.timer
@@ -76,7 +105,7 @@ removeFromGame = (client) ->
 
 # player loses turn if they take too long
 startTimer = (currPlayer, otherPlayer) ->
-	game = gameManager.getGameWithPlayer currPlayer
+	game = gameManager.getGameByPlayerId currPlayer
 	# interval ticker for each second - fire before timer for safety's sake
 	game.interval = setInterval ->
 		if game.isGameOver()
@@ -103,7 +132,7 @@ startTimer = (currPlayer, otherPlayer) ->
 	, Game.TURN_TIME
 
 resetTimer = (currPlayer, otherPlayer) ->
-	game = gameManager.getGameWithPlayer currPlayer
+	game = gameManager.getGameByPlayerId currPlayer
 	clearTimeout game.timer
 	clearInterval game.interval
 	startTimer currPlayer, otherPlayer
@@ -115,6 +144,15 @@ sendGameOver = (theGame) ->
 		idClientMap[player.id].send "gameOver:#{JSON.stringify(playerInfo)}"
 
 welcomePlayers = (game) ->
+	console.log "******** welcomePlayers: currPlayer.num=#{game.currPlayer.num}"
+	console.log "******** welcomePlayers: game.player1.id=#{game.player1.id}"
+	console.log "******** welcomePlayers: game.player1.name=#{game.player1.name}"
+	console.log "******** welcomePlayers: game.player1.num=#{game.player1.num}"
+	console.log "******** welcomePlayers: game.player2.id=#{game.player2.id}"
+	console.log "******** welcomePlayers: game.player2.name=#{game.player2.name}"
+	console.log "******** welcomePlayers: game.player2.num=#{game.player2.num}"
+	for i, c of idClientMap
+		console.log "*** welcome iclimap, i=#{i}, c.id=#{c.id}, player.id=#{player.id}"
 	info =
 		players: game.players
 		tiles: game.grid.tiles
@@ -144,7 +182,7 @@ handleMessage = (client, message) ->
 			else
 				console.log("**************** ERROR: Missing invitee")
 		when 'move'
-			game = gameManager.getGameWithPlayer client
+			game = gameManager.getGameByPlayerId client
 			return unless client.id is game.currPlayer.id #no cheating
 			if game.isGameOver()
 				clearInterval game.interval
@@ -193,15 +231,13 @@ forwardInvitation = (from, to) ->
 	return true
 
 handleInviteResponse = (inviteeName, response) ->
-	index = 0
 	for invitation in pendingInvitations
 		if invitation.to is inviteeName
 			inviter = gameManager.getPlayerByName(invitation.from)
 			# TODO: if not found!
 			idClientMap[inviter.id].send "inviteResponse:#{response}"
 			index = pendingInvitations.indexOf(invitation)
-			pendingInvitations.splice(index, 1) if i >= 0
+			pendingInvitations.splice(index, 1) if index >= 0
 			return true
-		index = index + 1
 	console.log "*********** ERROR: Missing invitation from #{inviteeName}"
 	return false

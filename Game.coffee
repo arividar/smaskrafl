@@ -28,9 +28,11 @@ class Game
 		if !@player1.id
 			@player1.id = sessionId
 			@player1.name = username
+			@player1.num = 1
 		else
 			@player2.id = sessionId
 			@player2.name = username
+			@player2.num = 2
 			
 	removePlayer: (sessionId) ->
 		@playerWithId(sessionId).id = null

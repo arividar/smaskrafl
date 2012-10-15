@@ -71,9 +71,10 @@ handleInviteRequest = (fromPlayer) ->
 		return
 	myState = ClientState.INVITE_RECEIVED
 	console.log "****** got invite from #{fromPlayer}"
+	console.log "****** javascript response: " + "<h3><a href=\"javascript:sendInviteResponse(false, \'#{fromPlayer}\'))\">Nei</a></h3>"
 	$('#ssLobby').html "<h2>#{fromPlayer} vill spila við þig. Viltu spila?</h2>"
-	$('#ssLobby').append "<h3><a href=\"javascript:sendInviteResponse(true)\">Já</a></h3>"
-	$('#ssLobby').append "<h3><a href=\"javascript:sendInviteResponse(false)\">Nei</a></h3>"
+	$('#ssLobby').append "<h3><a href=\"javascript:sendInviteResponse(true, \'#{fromPlayer}\')\">Já</a></h3>"
+	$('#ssLobby').append "<h3><a href=\"javascript:sendInviteResponse(false, \'#{fromPlayer}\')\">Nei</a></h3>"
 
 handleInviteResponse = (response) ->
 	if myState isnt ClientState.INVITE_SENT or not pendingInviteToPlayer?
@@ -92,23 +93,23 @@ handleInviteResponse = (response) ->
 		return
 	# Invitation response is 'yes':
 	console.log "****** got invite accepted from #{pendingInviteToPlayer}  - should redirect to ssClient"
-	$('#ssLobby').html "<h1>INVITE ACCEPTED BY #{pendingInviteToPlayer} - should redirect to ssClient</h1>"
-	self.location = "game.html"
+	$('#ssLobby').html "<h1>INVITE FROM #{pendingInviteToPlayer} ACCEPTED</h1>"
+	self.location = "game.html?player=#{myName}&opponent=#{pendingInviteToPlayer}"
 	showPlayerList()
 	pendingInviteToPlayer = null
 	myState = ClientState.READY_TO_PLAY
 
-sendInviteResponse = (yesIWantToPlay) ->
+sendInviteResponse = (yesIWantToPlay, opponent) ->
 	if myState isnt ClientState.INVITE_RECEIVED
 		console.log '************ ERROR - should be INVITE_RECEIVED'
 		$('#ssLobby').html "<h1>ERROR - should be INVITE_RECEIVED #{pendingInviteToPlayer}</h1>"
 		return
 	if yesIWantToPlay
 		console.log '********** YES I will play - redirect to ssClient'
-		$('#ssLobby').html "<h1>YES will play - should redirect to ssClient"
+		$('#ssLobby').html "<h1>YES will play"
 		myState = ClientState.READY_TO_PLAY
 		socket.send 'inviteResponse:yes'
-		# self.location = "game.html"
+		self.location = "game.html?player=#{myName}&opponent=#{opponent}"
 	else
 		console.log '********** NO I will not play'
 		$('#ssLobby').html "<h1>NO will play"

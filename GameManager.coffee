@@ -4,6 +4,7 @@
 
 # Manages creation and deletion of games
 class GameManager
+
 	constructor: ->
 		@players = []
 		@games = []
@@ -32,6 +33,20 @@ class GameManager
 			return player if player.name is name
 		null
 
+	getNewGame: ->
+		game = null
+		for g in @games
+			if g.wasPlayed
+				g.reset
+				game = g
+				break
+		if !game?
+			game = new Game
+		console.log "**** getNewGame the game is: #{game.wasPlayed}"
+		@words = game.dictionary.originalWordList if !@words?
+		@games.push game
+		game
+
 	getNextAvailableGame: ->
 		# if there aren't any games, create a new one
 		if @games.length is 0
@@ -45,7 +60,13 @@ class GameManager
 			@games[@games.length - 1].reset()
 		@games[@games.length - 1]
 
-	getGameWithPlayer: (client) ->
+	getGameByPlayerName: (pname) ->
+		for game in @games
+			for player in game.players
+				return game if player.name is pname
+		return null
+
+	getGameByPlayerId: (client) ->
 		for game in @games
 			for player in game.players
 				return game if player.id is client.id

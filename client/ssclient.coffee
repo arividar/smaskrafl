@@ -50,7 +50,6 @@ Url =
         i += 3
     string
 
-
 iceHTMLChar = (c) ->
 	switch c
 		when 'Á' then '&Aacute;'
@@ -85,7 +84,6 @@ root = exports ? window
 root.iceHTMLChar = iceHTMLChar
 root.Url = Url
 root.getUrlVars = getUrlVars
-
 
 # forced = true when last turn ended because a player took too long
 startTurn = (player, forced = false) ->
@@ -200,7 +198,6 @@ handleMessage = (message) ->
 		when 'welcome'
 			{players, currPlayerNum, tiles, yourNum: myNum, newWords, turnTime} = JSON.parse content
 			startGame players, currPlayerNum
-			# update page
 			$('#usedwords, #grid, #meScore, #opponentScore').show()
 			$('#usedwords').html ""
 			usedWords = {}
@@ -234,7 +231,6 @@ handleMessage = (message) ->
 				$(turnTimer).html parseInt($(turnTimer).html()) - 1
 				if parseInt($(turnTimer).html()) <= 5
 					$(turnTimer).removeClass('turnColorRed turnColorGreen').addClass('turnColorYellow')
-
 		when 'gameOver'
 			{winner, yourNum:myNum} = JSON.parse content
 			endGame(winner)
@@ -321,8 +317,10 @@ $(document).ready ->
 	$('#grid li').live 'click', tileClick
 	urlVars = getUrlVars()
 	pname = Url.decode urlVars["player"]
+	oname = Url.decode urlVars["opponent"]
+	players = {p1: pname, p2: oname}
 	socket = io.connect()
-	socket.emit 'login', { playername:pname }
+	socket.emit "newGame", "#{JSON.stringify players}"
 	socket.on 'connect', ->
 		showMessage 'waitForConnection'
 	socket.on 'message', handleMessage

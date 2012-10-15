@@ -44,13 +44,8 @@ class Dictionary
 				if grid.inRange(x - offset, y - offset) and grid.inRange(x - offset + range, y - offset + range)
 					addTiles (i) -> grid.tiles[x - offset + i][y - offset + i]
 				# Diagonal (lower-left to upper-right)
-				# fixed code from book
 				if grid.inRange(x + offset, y - offset) and grid.inRange(x + offset - range, y - offset + range)
 					addTiles (i) -> grid.tiles[x + offset - i][y - offset + i]
-				# original code
-				# if grid.inRange(x - offset, y + offset) and 
-				# 	 grid.inRange(x - offset + range, y + offset - range) 
-				# 	addTiles (i) -> grid.tiles[x - offset + i][y + offset - i]
 		str for str in strings when @isWord str
 
 root = exports ? window
