@@ -152,7 +152,7 @@ welcomePlayers = (game) ->
 	console.log "******** welcomePlayers: game.player2.name=#{game.player2.name}"
 	console.log "******** welcomePlayers: game.player2.num=#{game.player2.num}"
 	for i, c of idClientMap
-		console.log "*** welcome iclimap, i=#{i}, c.id=#{c.id}, player.id=#{player.id}"
+		console.log "*** welcome iclimap, i=#{i}, c.id=#{c.id}"
 	info =
 		players: game.players
 		tiles: game.grid.tiles
