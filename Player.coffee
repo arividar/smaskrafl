@@ -10,9 +10,9 @@ scoreMove = (dictionary, swapCoordinates) ->
 	moveScore = multiplier = 0
 	newWords = []
 	for word in words when dictionary.isWord(word) and dictionary.markUsed(word)
-	  multiplier++
-	  moveScore += tileValues[letter] for letter in word
-	  newWords.push word
+		multiplier++
+		moveScore += tileValues[letter] for letter in word
+		newWords.push word
 	moveScore *= multiplier
 	{moveScore, newWords}
 
