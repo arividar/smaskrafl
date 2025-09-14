@@ -17,7 +17,9 @@ scoreMove = (dictionary, swapCoordinates) ->
 	{moveScore, newWords}
 
 class Player
-	constructor: (@id, @name) ->
+	constructor: (@id, @name, @dictionary) ->
+		@score = 0
+		@moveCount = 0
 
 	setDictionary: (@dictionary) ->
 		@score = 0

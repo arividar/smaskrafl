@@ -60,9 +60,12 @@
   };
 
   Player = class Player {
-    constructor(id, name) {
+    constructor(id, name, dictionary1) {
       this.id = id;
       this.name = name;
+      this.dictionary = dictionary1;
+      this.score = 0;
+      this.moveCount = 0;
     }
 
     setDictionary(dictionary1) {
