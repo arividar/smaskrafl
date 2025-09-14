@@ -13,38 +13,40 @@ typeAndContent = (message) ->
 	[ignore, type, content] = message.match /(.*?):(.*)/
 	{type, content}
 
-handleMessage = (message) ->
-	{type, content} = typeAndContent message
-	switch type
-		when 'loginFail'
-			$("#ssLogin").append "<h2>******* LOGIN FAILED!</h2>"
-		when 'playerList'
-			if myState isnt ClientState.NOT_LOGGED_IN
-				console.log "************ ERROR: Wrong state at playerList: #{myState}"
-				return
-			plist = JSON.parse content
-			playerList = plist.split(',')
-			$("#ssLogin").remove()
-			showPlayerList()
-			myState = ClientState.IN_LOBBY
-		when 'newPlayer'
-			pname = JSON.parse content
-			showPlayerList(pname)
-		when 'removePlayer'
-			pname = JSON.parse content
-			console.log "******** removePlayer #{pname}"
-			i = playerList.indexOf(pname)
-			playerList.splice(i, 1) if i >= 0
-			showPlayerList()
-		when 'inviteFrom'
-			handleInviteRequest(content)
-		when 'inviteResponse'
-			handleInviteResponse(content)
+handleLoginFail = ->
+	$("#ssLogin").append "<h2>******* LOGIN FAILED!</h2>"
+
+handlePlayerList = (plist) ->
+	if myState isnt ClientState.NOT_LOGGED_IN
+		console.log "************ ERROR: Wrong state at playerList: #{myState}"
+		return
+	playerList = plist.split(',')
+	$("#ssLogin").remove()
+	showPlayerList()
+	myState = ClientState.IN_LOBBY
+
+handleNewPlayer = (pname) ->
+	showPlayerList(JSON.parse(pname))
+
+handleRemovePlayer = (pname) ->
+	console.log "******** removePlayer #{pname}"
+	playerName = JSON.parse(pname)
+	i = playerList.indexOf(playerName)
+	playerList.splice(i, 1) if i >= 0
+	showPlayerList()
 
 login = (uname) ->
 	myName = uname
 	socket = io.connect()
-	socket.on 'message', handleMessage
+
+	# Set up event listeners for modern Socket.IO
+	socket.on 'loginFail', handleLoginFail
+	socket.on 'playerList', handlePlayerList
+	socket.on 'newPlayer', handleNewPlayer
+	socket.on 'removePlayer', handleRemovePlayer
+	socket.on 'inviteFrom', handleInviteRequest
+	socket.on 'inviteResponse', handleInviteResponse
+
 	socket.emit 'login', { playername:uname }
 
 showPlayerList = (pname) ->
@@ -67,7 +69,7 @@ playerListToHtml = (plist) ->
 handleInviteRequest = (fromPlayer) ->
 	if myState isnt ClientState.IN_LOBBY
 		console.log "****** got invite from #{fromPlayer} but not in IN_LOBBY State"
-		socket.emit 'inviteResponse:no'
+		socket.emit 'inviteResponse', 'no'
 		return
 	myState = ClientState.INVITE_RECEIVED
 	console.log "****** got invite from #{fromPlayer}"
@@ -108,20 +110,20 @@ sendInviteResponse = (yesIWantToPlay, opponent) ->
 		console.log '********** YES I will play - redirect to ssClient'
 		$('#ssLobby').html "<h1>YES will play"
 		myState = ClientState.READY_TO_PLAY
-		socket.send 'inviteResponse:yes'
+		socket.emit 'inviteResponse', 'yes'
 		self.location = "game.html?player=#{myName}&opponent=#{opponent}"
 	else
 		console.log '********** NO I will not play'
 		$('#ssLobby').html "<h1>NO will play"
 		myState = ClientState.IN_LOBBY
-		socket.send 'inviteResponse:no'
+		socket.emit 'inviteResponse', 'no'
 
 sendPlayerInvite = (toPlayer) ->
 	console.log("****** sending invite to #{toPlayer}")
 	$('#ssLobby').html "<h1>SENT INVITE TO #{toPlayer}</h1>"
 	pendingInviteToPlayer = toPlayer
 	myState = ClientState.INVITE_SENT
-	socket.send "invite:#{toPlayer}"
+	socket.emit "invite", toPlayer
 
 root = exports ? window
 root.login = login

@@ -169,7 +169,7 @@ tileClick = ->
 		else
 			selectedCoordinates.x2 = x
 			selectedCoordinates.y2 = y
-			socket.send "move:#{JSON.stringify selectedCoordinates}"
+			socket.emit "move", JSON.stringify selectedCoordinates
 			endTurn(null, false)
 
 swapTiles = ({x1, y1, x2, y2}) ->
@@ -192,48 +192,51 @@ updateUsedWords = (newWords) ->
 					.join(", ")
 	$('#usedwords').html usedWords.wordsHtml
 	
-handleMessage = (message) ->
-	{type, content} = typeAndContent message
-	switch type
-		when 'welcome'
-			{players, currPlayerNum, tiles, yourNum: myNum, newWords, turnTime} = JSON.parse content
-			startGame players, currPlayerNum
-			$('#usedwords, #grid, #meScore, #opponentScore').show()
-			$('#usedwords').html ""
-			usedWords = {}
-			updateUsedWords newWords
-		when 'moveResult'
-			{player, swapCoordinates, moveScore, newWords} = JSON.parse content
-			showMoveResult player, swapCoordinates, moveScore, newWords
-			updateUsedWords newWords
-		when 'opponentQuit'
-			showMessage 'opponentQuit'
-		when 'timeIsUp'
-			player = JSON.parse content
-			endTurn(player, true)
-		when 'yourTurnNow'
-			player = JSON.parse content
-			startTurn(player, true)
-		when 'tick'
-			# tick for first tick of turn, tock for others
-			tick = JSON.parse content
-			if myTurn
-				turnTimer = "#meTimer"
-				nonTurnTimer = "#opponentTimer"
-			else
-				turnTimer = "#opponentTimer"
-				nonTurnTimer = "#meTimer"
-			if tick is "tick"
-				$(turnTimer).html turnTime
-				$(nonTurnTimer).hide()
-				$(turnTimer).show()
-			else
-				$(turnTimer).html parseInt($(turnTimer).html()) - 1
-				if parseInt($(turnTimer).html()) <= 5
-					$(turnTimer).removeClass('turnColorRed turnColorGreen').addClass('turnColorYellow')
-		when 'gameOver'
-			{winner, yourNum:myNum} = JSON.parse content
-			endGame(winner)
+handleWelcome = (data) ->
+	{players, currPlayerNum, tiles, yourNum: myNum, newWords, turnTime} = JSON.parse data
+	startGame players, currPlayerNum
+	$('#usedwords, #grid, #meScore, #opponentScore').show()
+	$('#usedwords').html ""
+	usedWords = {}
+	updateUsedWords newWords
+
+handleMoveResult = (data) ->
+	{player, swapCoordinates, moveScore, newWords} = JSON.parse data
+	showMoveResult player, swapCoordinates, moveScore, newWords
+	updateUsedWords newWords
+
+handleOpponentQuit = ->
+	showMessage 'opponentQuit'
+
+handleTimeIsUp = (data) ->
+	player = JSON.parse data
+	endTurn(player, true)
+
+handleYourTurnNow = (data) ->
+	player = JSON.parse data
+	startTurn(player, true)
+
+handleTick = (data) ->
+	# tick for first tick of turn, tock for others
+	tick = JSON.parse data
+	if myTurn
+		turnTimer = "#meTimer"
+		nonTurnTimer = "#opponentTimer"
+	else
+		turnTimer = "#opponentTimer"
+		nonTurnTimer = "#meTimer"
+	if tick is "tick"
+		$(turnTimer).html turnTime
+		$(nonTurnTimer).hide()
+		$(turnTimer).show()
+	else
+		$(turnTimer).html parseInt($(turnTimer).html()) - 1
+		if parseInt($(turnTimer).html()) <= 5
+			$(turnTimer).removeClass('turnColorRed turnColorGreen').addClass('turnColorYellow')
+
+handleGameOver = (data) ->
+	{winner, yourNum:myNum} = JSON.parse data
+	endGame(winner)
 
 typeAndContent = (message) ->
 	[ignore, type, content] = message.match /(.*?):(.*)/
@@ -320,7 +323,16 @@ $(document).ready ->
 	oname = Url.decode urlVars["opponent"]
 	players = {p1: pname, p2: oname}
 	socket = io.connect()
+
+	# Set up event listeners for modern Socket.IO
+	socket.on 'welcome', handleWelcome
+	socket.on 'moveResult', handleMoveResult
+	socket.on 'opponentQuit', handleOpponentQuit
+	socket.on 'timeIsUp', handleTimeIsUp
+	socket.on 'yourTurnNow', handleYourTurnNow
+	socket.on 'tick', handleTick
+	socket.on 'gameOver', handleGameOver
+
 	socket.emit "newGame", "#{JSON.stringify players}"
 	socket.on 'connect', ->
 		showMessage 'waitForConnection'
-	socket.on 'message', handleMessage

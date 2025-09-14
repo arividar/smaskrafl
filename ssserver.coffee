@@ -55,9 +55,39 @@ socket.on 'connection', (client) =>
 		for id, c of idClientMap
 			console.log "************** on newgame - climapid - c.id=#{c.id}, id=#{id}"
 		newGame(client, p1, p2)
-	client.on 'message', (message) =>
-		console.log "************** ssServer got message from client #{client.id}:#{message}"
-		handleMessage client, message
+	client.on 'invite', (targetPlayer) =>
+		console.log "************** ssServer got invite from client #{client.id} to #{targetPlayer}"
+		inviter = gameManager.getPlayerById(client.id)
+		invitee = gameManager.getPlayerByName(targetPlayer)
+		if invitee? and inviter?
+			forwardInvitation(inviter, invitee)
+		else
+			console.log("**************** ERROR: Missing inviter or invitee")
+
+	client.on 'inviteResponse', (response) =>
+		console.log "************** ssServer got inviteResponse from client #{client.id}: #{response}"
+		invitee = gameManager.getPlayerById(client.id)
+		if invitee?
+			handleInviteResponse(invitee.name, response)
+		else
+			console.log("**************** ERROR: Missing invitee")
+
+	client.on 'move', (moveData) =>
+		console.log "************** ssServer got move from client #{client.id}: #{moveData}"
+		game = gameManager.getGameByPlayerId client
+		return unless client.id is game.currPlayer.id #no cheating
+		if game.isGameOver()
+			clearInterval game.interval
+			sendGameOver game
+		else
+			swapCoordinates = JSON.parse moveData
+			{moveScore, newWords} = game.currPlayer.makeMove swapCoordinates
+			result = {swapCoordinates, moveScore, player: game.currPlayer, newWords: getWords(newWords)}
+			# only send results to players, reset timer since move has been made
+			for player in game.players
+				idClientMap[player.id].emit "moveResult", JSON.stringify(result)
+			game.endTurn()
+			resetTimer game.currPlayer, game.otherPlayer
 	client.on 'disconnect', =>
 		# removeFromGame client
 		console.log "***** disconnect"
@@ -164,37 +194,7 @@ welcomePlayers = (game) ->
 	# reset things just to be safe - could be an old game getting recycled
 	resetTimer game.currPlayer, game.otherPlayer
 	
-handleMessage = (client, message) ->
-	{type, content} = typeAndContent message
-	switch type
-		when 'invite'
-			inviter = gameManager.getPlayerById(client.id)
-			invitee = gameManager.getPlayerByName(content)
-			if invitee? and inviter?
-				forwardInvitation(inviter, invitee)
-			else
-				console.log("**************** ERROR: Missing inviter or invitee")
-		when 'inviteResponse'
-			invitee = gameManager.getPlayerById(client.id)
-			if invitee? 
-				handleInviteResponse(invitee.name, content)
-			else
-				console.log("**************** ERROR: Missing invitee")
-		when 'move'
-			game = gameManager.getGameByPlayerId client
-			return unless client.id is game.currPlayer.id #no cheating
-			if game.isGameOver()
-				clearInterval game.interval
-				sendGameOver
-			else
-				swapCoordinates = JSON.parse content
-				{moveScore, newWords} = game.currPlayer.makeMove swapCoordinates
-				result = {swapCoordinates, moveScore, player: game.currPlayer, newWords: getWords(newWords)}
-				# only send results to players, reset timer since move has been made
-				for player in game.players
-					idClientMap[player.id].emit "moveResult", JSON.stringify(result)
-				game.endTurn()
-				resetTimer game.currPlayer, game.otherPlayer
+# handleMessage function removed - replaced with individual event listeners above
 
 
 # gather used words and defs - only send new ones
