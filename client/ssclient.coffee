@@ -74,11 +74,11 @@ iceHTMLChar = (c) ->
 		else c
 
 getUrlVars = ->
-	  vars = {}
-	  parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/g, (m, key, value) ->
-		    vars[key] = value
-	  )
-	  vars
+	vars = {}
+	parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/g, (m, key, value) ->
+		vars[key] = value
+	)
+	vars
 
 root = exports ? window
 root.iceHTMLChar = iceHTMLChar
