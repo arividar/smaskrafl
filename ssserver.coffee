@@ -7,14 +7,13 @@ io = require('socket.io')
 console.log('***** dirname: '+__dirname + '/client')
 
 # Create server
-app = express.createServer()
+app = express()
 app.use express.static(__dirname + '/client')
-app.use express.errorHandler { showStacktrace: true, dumpExceptions: true }
-app.use express.bodyParser()
+app.use express.urlencoded({ extended: true })
 
 # Process client requests
 app.get "/", (req, res) ->
-	res.sendfile "client/index.html"
+	res.sendFile __dirname + "/client/index.html"
 
 app.post "/send", (req, res) ->
 	res.redirect "/game.html\?player=#{req.body.userName}"
@@ -22,7 +21,7 @@ app.post "/send", (req, res) ->
 # Start server
 port = process.env.PORT || 3000
 console.log 'Listening to port '+port
-app.listen port
+server = app.listen port
 console.log "Browse to http://localhost:#{port} to play"
 
 # Game server
@@ -31,21 +30,21 @@ idClientMap = {}
 pendingInvitations = []
 
 # Bind socket to HTTP server
-socket = io.listen app
+socket = io(server)
 
 # Handle client messages
-socket.sockets.on 'connection', (client) =>
+socket.on 'connection', (client) =>
 	client.on 'login', (loginInfo) =>
 		if gameManager.login(client.id, loginInfo.playername)
 			idClientMap[client.id] = client
 			console.log "************** login - climap=#{idClientMap}"
 			for id, c of idClientMap
 				console.log "************** login - climapid - id=#{id}, c.id=#{c.id}, len=#{(val for key, val of idClientMap).length}"
-				c.send "newPlayer:#{JSON.stringify(loginInfo.playername)}" if id isnt client.id
+				c.emit "newPlayer", JSON.stringify(loginInfo.playername) if id isnt client.id
 			logClientIdMap()
-			client.send "playerList:#{JSON.stringify((p.name for p in gameManager.players).join(','))}"		
+			client.emit "playerList", JSON.stringify((p.name for p in gameManager.players).join(','))
 		else
-			client.send "loginFail"
+			client.emit "loginFail"
 			#TODO: Respond and handle failed loginxxx
 	client.on 'newGame', (thePlayers) =>
 		console.log "************** ssServer got newGame from client #{client.id}:#{thePlayers}"
@@ -64,7 +63,7 @@ socket.sockets.on 'connection', (client) =>
 		console.log "***** disconnect"
 		p = gameManager.getPlayerById(client.id)
 		for id, c of idClientMap
-			c.send "removePlayer:#{JSON.stringify(p.name)}" if id isnt client.id
+			c.emit "removePlayer", JSON.stringify(p.name) if id isnt client.id
 		gameManager.logout client.id
 		delete idClientMap[client.id]
 		logClientIdMap()
@@ -99,7 +98,7 @@ removeFromGame = (client) ->
 	clearTimeout game.timer
 	clearInterval game.interval
 	for player in game.players
-		idClientMap[player.id].send "opponentQuit: blank" if player.id
+		idClientMap[player.id].emit "opponentQuit", "blank" if player.id
 	# two players in games where opponent quit can be connected automatically
 	gameManager.connectOrphanedPlayers(welcomePlayers)
 
@@ -113,11 +112,11 @@ startTimer = (currPlayer, otherPlayer) ->
 			sendGameOver game
 		else
 			for player in game.players
-				idClientMap[player.id].send "tick:#{JSON.stringify('tock')}"
+				idClientMap[player.id].emit "tick", JSON.stringify('tock')
 	, 1000
 	# fire off first tick
 	for player in game.players
-		idClientMap[player.id].send "tick:#{JSON.stringify('tick')}"
+		idClientMap[player.id].emit "tick", JSON.stringify('tick')
 	# timer for turn
 	game.timer = setTimeout ->
 		currPlayer.moveCount++
@@ -125,8 +124,8 @@ startTimer = (currPlayer, otherPlayer) ->
 			sendGameOver
 		else
 			resetTimer otherPlayer, currPlayer
-			idClientMap[currPlayer.id].send "timeIsUp: #{JSON.stringify(currPlayer)}"
-			idClientMap[otherPlayer.id].send "yourTurnNow: #{JSON.stringify(currPlayer)}"
+			idClientMap[currPlayer.id].emit "timeIsUp", JSON.stringify(currPlayer)
+			idClientMap[otherPlayer.id].emit "yourTurnNow", JSON.stringify(currPlayer)
 			game.endTurn()
 			resetTimer otherPlayer, currPlayer
 	, Game.TURN_TIME
@@ -141,7 +140,7 @@ sendGameOver = (theGame) ->
 	info = {winner:theGame.winner()}
 	for player in theGame.players
 		playerInfo = extend {}, info, {yourNum: player.num}
-		idClientMap[player.id].send "gameOver:#{JSON.stringify(playerInfo)}"
+		idClientMap[player.id].emit "gameOver", JSON.stringify(playerInfo)
 
 welcomePlayers = (game) ->
 	console.log "******** welcomePlayers: currPlayer.num=#{game.currPlayer.num}"
@@ -161,7 +160,7 @@ welcomePlayers = (game) ->
 		turnTime: Game.TURN_TIME/1000
 	for player in game.players
 		playerInfo = extend {}, info, {yourNum: player.num}
-		idClientMap[player.id].send "welcome:#{JSON.stringify playerInfo}"
+		idClientMap[player.id].emit "welcome", JSON.stringify(playerInfo)
 	# reset things just to be safe - could be an old game getting recycled
 	resetTimer game.currPlayer, game.otherPlayer
 	
@@ -193,7 +192,7 @@ handleMessage = (client, message) ->
 				result = {swapCoordinates, moveScore, player: game.currPlayer, newWords: getWords(newWords)}
 				# only send results to players, reset timer since move has been made
 				for player in game.players
-					idClientMap[player.id].send "moveResult:#{JSON.stringify result}"
+					idClientMap[player.id].emit "moveResult", JSON.stringify(result)
 				game.endTurn()
 				resetTimer game.currPlayer, game.otherPlayer
 
@@ -222,12 +221,12 @@ forwardInvitation = (from, to) ->
 	for i in pendingInvitations
 		if from.name is i.from or from.name is i.to or to.name is i.from or to.name is i.to
 			# TODO: Invitation exists and should not be forwarded
-			idClientMap[from.id].send "inviteResponse:no"
+			idClientMap[from.id].emit "inviteResponse", "no"
 			console.log "**** invitation already exists for either #{from} or #{to}"
 			return false
 	pendingInvitations.push { from: from.name, to: to.name }
 	console.log "**** forwarding invite from #{from.name} to #{to.name}"
-	idClientMap[to.id].send "inviteFrom:#{from.name}"
+	idClientMap[to.id].emit "inviteFrom", from.name
 	return true
 
 handleInviteResponse = (inviteeName, response) ->
@@ -235,7 +234,7 @@ handleInviteResponse = (inviteeName, response) ->
 		if invitation.to is inviteeName
 			inviter = gameManager.getPlayerByName(invitation.from)
 			# TODO: if not found!
-			idClientMap[inviter.id].send "inviteResponse:#{response}"
+			idClientMap[inviter.id].emit "inviteResponse", response
 			index = pendingInvitations.indexOf(invitation)
 			pendingInvitations.splice(index, 1) if index >= 0
 			return true
