@@ -332,7 +332,19 @@ $(document).ready ->
 	socket.on 'yourTurnNow', handleYourTurnNow
 	socket.on 'tick', handleTick
 	socket.on 'gameOver', handleGameOver
+	socket.on 'playerList', -> # ignore playerList in game client
+		console.log "Game client received playerList (ignoring)"
 
-	socket.emit "newGame", "#{JSON.stringify players}"
+	# Login first, then send newGame when logged in
 	socket.on 'connect', ->
+		console.log "Game client connected, logging in as #{pname}"
 		showMessage 'waitForConnection'
+		socket.emit 'login', {playername: pname}
+
+	socket.on 'loginFail', ->
+		console.error "Game client login failed!"
+
+	# Wait for login success before sending newGame
+	socket.on 'playerList', ->
+		console.log "Game client login successful, sending newGame"
+		socket.emit "newGame", "#{JSON.stringify players}"

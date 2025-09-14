@@ -85,15 +85,17 @@ socket.on 'connection', (client) =>
 			result = {swapCoordinates, moveScore, player: game.currPlayer, newWords: getWords(newWords)}
 			# only send results to players, reset timer since move has been made
 			for player in game.players
-				idClientMap[player.id].emit "moveResult", JSON.stringify(result)
+				if player.id and idClientMap[player.id]
+					idClientMap[player.id].emit "moveResult", JSON.stringify(result)
 			game.endTurn()
 			resetTimer game.currPlayer, game.otherPlayer
 	client.on 'disconnect', =>
 		# removeFromGame client
 		console.log "***** disconnect"
 		p = gameManager.getPlayerById(client.id)
-		for id, c of idClientMap
-			c.emit "removePlayer", JSON.stringify(p.name) if id isnt client.id
+		if p
+			for id, c of idClientMap
+				c.emit "removePlayer", JSON.stringify(p.name) if id isnt client.id
 		gameManager.logout client.id
 		delete idClientMap[client.id]
 		logClientIdMap()
@@ -128,7 +130,8 @@ removeFromGame = (client) ->
 	clearTimeout game.timer
 	clearInterval game.interval
 	for player in game.players
-		idClientMap[player.id].emit "opponentQuit", "blank" if player.id
+		if player.id and idClientMap[player.id]
+			idClientMap[player.id].emit "opponentQuit", "blank"
 	# two players in games where opponent quit can be connected automatically
 	gameManager.connectOrphanedPlayers(welcomePlayers)
 
@@ -142,11 +145,13 @@ startTimer = (currPlayer, otherPlayer) ->
 			sendGameOver game
 		else
 			for player in game.players
-				idClientMap[player.id].emit "tick", JSON.stringify('tock')
+				if player.id and idClientMap[player.id]
+					idClientMap[player.id].emit "tick", JSON.stringify('tock')
 	, 1000
 	# fire off first tick
 	for player in game.players
-		idClientMap[player.id].emit "tick", JSON.stringify('tick')
+		if player.id and idClientMap[player.id]
+			idClientMap[player.id].emit "tick", JSON.stringify('tick')
 	# timer for turn
 	game.timer = setTimeout ->
 		currPlayer.moveCount++
@@ -154,8 +159,10 @@ startTimer = (currPlayer, otherPlayer) ->
 			sendGameOver
 		else
 			resetTimer otherPlayer, currPlayer
-			idClientMap[currPlayer.id].emit "timeIsUp", JSON.stringify(currPlayer)
-			idClientMap[otherPlayer.id].emit "yourTurnNow", JSON.stringify(currPlayer)
+			if currPlayer.id and idClientMap[currPlayer.id]
+				idClientMap[currPlayer.id].emit "timeIsUp", JSON.stringify(currPlayer)
+			if otherPlayer.id and idClientMap[otherPlayer.id]
+				idClientMap[otherPlayer.id].emit "yourTurnNow", JSON.stringify(currPlayer)
 			game.endTurn()
 			resetTimer otherPlayer, currPlayer
 	, Game.TURN_TIME
@@ -169,8 +176,9 @@ resetTimer = (currPlayer, otherPlayer) ->
 sendGameOver = (theGame) ->
 	info = {winner:theGame.winner()}
 	for player in theGame.players
-		playerInfo = extend {}, info, {yourNum: player.num}
-		idClientMap[player.id].emit "gameOver", JSON.stringify(playerInfo)
+		if player.id and idClientMap[player.id]
+			playerInfo = extend {}, info, {yourNum: player.num}
+			idClientMap[player.id].emit "gameOver", JSON.stringify(playerInfo)
 
 welcomePlayers = (game) ->
 	console.log "******** welcomePlayers: currPlayer.num=#{game.currPlayer.num}"
@@ -189,8 +197,9 @@ welcomePlayers = (game) ->
 		newWords: getWords(game.dictionary.usedWords)
 		turnTime: Game.TURN_TIME/1000
 	for player in game.players
-		playerInfo = extend {}, info, {yourNum: player.num}
-		idClientMap[player.id].emit "welcome", JSON.stringify(playerInfo)
+		if player.id and idClientMap[player.id]
+			playerInfo = extend {}, info, {yourNum: player.num}
+			idClientMap[player.id].emit "welcome", JSON.stringify(playerInfo)
 	# reset things just to be safe - could be an old game getting recycled
 	resetTimer game.currPlayer, game.otherPlayer
 	

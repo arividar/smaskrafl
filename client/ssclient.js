@@ -459,9 +459,24 @@ ${winner.name} vann!
     socket.on('yourTurnNow', handleYourTurnNow);
     socket.on('tick', handleTick);
     socket.on('gameOver', handleGameOver);
-    socket.emit("newGame", `${JSON.stringify(players)}`);
-    return socket.on('connect', function() {
-      return showMessage('waitForConnection');
+    socket.on('playerList', function() { // ignore playerList in game client
+      return console.log("Game client received playerList (ignoring)");
+    });
+    // Login first, then send newGame when logged in
+    socket.on('connect', function() {
+      console.log(`Game client connected, logging in as ${pname}`);
+      showMessage('waitForConnection');
+      return socket.emit('login', {
+        playername: pname
+      });
+    });
+    socket.on('loginFail', function() {
+      return console.error("Game client login failed!");
+    });
+    // Wait for login success before sending newGame
+    return socket.on('playerList', function() {
+      console.log("Game client login successful, sending newGame");
+      return socket.emit("newGame", `${JSON.stringify(players)}`);
     });
   });
 
