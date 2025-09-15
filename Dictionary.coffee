@@ -22,7 +22,10 @@ class Dictionary
 		str in @wordList
 
 	isNewWord: (str) ->
-		str in @wordList and str not in @usedWords
+		if str in @usedWords
+			false
+		else
+			str in @wordList 
 
 	wordsThroughTile: (x,y) ->
 		# numbers in JSON come back as strings so coerce into nums
