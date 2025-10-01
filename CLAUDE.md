@@ -34,7 +34,7 @@ Smákrafl is an Icelandic word game (similar to Scrabble) built with CoffeeScrip
 - `Game`: Individual game state, players, scoring, turn management
 - `Player`: Player data including ID, name, score, move count
 - `Dictionary`: Icelandic word validation using word list from `nonfetlc.js`
-- `Grid`: 4x4+ game board for letter tiles
+- `Grid`: 8x8 game board for letter tiles
 
 ### Client-Side Structure
 
