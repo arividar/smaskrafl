@@ -193,7 +193,11 @@ updateUsedWords = (newWords) ->
 	$('#usedwords').html usedWords.wordsHtml
 	
 handleWelcome = (data) ->
-	{players, currPlayerNum, tiles, yourNum: myNum, newWords, turnTime} = JSON.parse data
+	parsedData = JSON.parse data
+	{players, currPlayerNum, newWords} = parsedData
+	tiles = parsedData.tiles
+	myNum = parsedData.yourNum
+	turnTime = parsedData.turnTime
 	startGame players, currPlayerNum
 	$('#usedwords, #grid, #meScore, #opponentScore').show()
 	$('#usedwords').html ""
