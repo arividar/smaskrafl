@@ -268,15 +268,12 @@
   };
 
   handleWelcome = function(data) {
-    var currPlayerNum, newWords, players;
-    ({
-      players,
-      currPlayerNum,
-      tiles,
-      yourNum: myNum,
-      newWords,
-      turnTime
-    } = JSON.parse(data));
+    var currPlayerNum, newWords, parsedData, players;
+    parsedData = JSON.parse(data);
+    ({players, currPlayerNum, newWords} = parsedData);
+    tiles = parsedData.tiles;
+    myNum = parsedData.yourNum;
+    turnTime = parsedData.turnTime;
     startGame(players, currPlayerNum);
     $('#usedwords, #grid, #meScore, #opponentScore').show();
     $('#usedwords').html("");

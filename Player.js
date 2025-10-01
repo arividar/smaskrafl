@@ -84,7 +84,7 @@
     }
 
     toJSON() {
-      return {id: this.id, name: this.name, score: this.score, moveCount: this.moveCount};
+      return {id: this.id, name: this.name, score: this.score, moveCount: this.moveCount, num: this.num};
     }
 
   };

@@ -75,6 +75,9 @@ socket.on 'connection', (client) =>
 	client.on 'move', (moveData) =>
 		console.log "************** ssServer got move from client #{client.id}: #{moveData}"
 		game = gameManager.getGameByPlayerId client
+		if not game?
+			console.log "************** ERROR: Player #{client.id} tried to move but is not in any game"
+			return
 		return unless client.id is game.currPlayer.id #no cheating
 		if game.isGameOver()
 			clearInterval game.interval
@@ -227,6 +230,14 @@ extend = (a, others...) ->
 	a
 
 forwardInvitation = (from, to) ->
+	# Check if clients are still connected
+	if not idClientMap[from.id]?
+		console.log "**** ERROR: Inviter #{from.name} is no longer connected"
+		return false
+	if not idClientMap[to.id]?
+		console.log "**** ERROR: Invitee #{to.name} is no longer connected"
+		return false
+
 	for i in pendingInvitations
 		if from.name is i.from or from.name is i.to or to.name is i.from or to.name is i.to
 			# TODO: Invitation exists and should not be forwarded
@@ -242,7 +253,16 @@ handleInviteResponse = (inviteeName, response) ->
 	for invitation in pendingInvitations
 		if invitation.to is inviteeName
 			inviter = gameManager.getPlayerByName(invitation.from)
-			# TODO: if not found!
+			if not inviter?
+				console.log "*********** ERROR: Inviter #{invitation.from} not found in game manager"
+				index = pendingInvitations.indexOf(invitation)
+				pendingInvitations.splice(index, 1) if index >= 0
+				return false
+			if not idClientMap[inviter.id]?
+				console.log "*********** ERROR: Inviter #{invitation.from} is no longer connected"
+				index = pendingInvitations.indexOf(invitation)
+				pendingInvitations.splice(index, 1) if index >= 0
+				return false
 			idClientMap[inviter.id].emit "inviteResponse", response
 			index = pendingInvitations.indexOf(invitation)
 			pendingInvitations.splice(index, 1) if index >= 0
